@@ -11,5 +11,5 @@ public class AppInitializer : MonoBehaviour
         _sceneLoader = sceneLoader;
     }
 
-    private void Start() => _sceneLoader.LoadSceneAsync(Scene.MenuScene);
+    private void Start() => _sceneLoader.LoadSceneAsync(Scene.HomeScene);
 }
