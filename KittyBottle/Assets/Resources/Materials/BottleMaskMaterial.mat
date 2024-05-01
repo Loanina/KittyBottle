@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: New Material
+  m_Name: BottleMaskMaterial
   m_Shader: {fileID: -6465566751694194690, guid: ae753d21cc8e5134d828b5ec16625800, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -67,8 +67,17 @@ Material:
     m_Ints: []
     m_Floats:
     - _EnableExternalAlpha: 0
+    - _FillAmount: 0.68
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _ScaleAndRotationMultiplyProperty: 1
     m_Colors:
-    - _Color: {r: 0.2235294, g: 0.5372549, b: 0.4392017, a: 1}
+    - _Color: {r: 0.12467971, g: 0.34117648, b: 0.0627451, a: 0.29803923}
+    - _Color2: {r: 0.7169812, g: 0.09740117, b: 0.09740117, a: 0}
+    - _Color3: {r: 1, g: 1, b: 1, a: 0}
+    - _Color4: {r: 0.7995562, g: 0.8301887, b: 0.4260591, a: 0}
+    - _FillAmount: {r: 1, g: 0, b: 0, a: 0}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
+    - _pos: {r: 100, g: 40, b: 0, a: 0}
   m_BuildTextureStacks: []
