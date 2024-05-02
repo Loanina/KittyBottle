@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 40594925}
   - component: {fileID: 40594926}
+  - component: {fileID: 40594927}
   m_Layer: 0
   m_Name: Bottle
   m_TagString: Untagged
@@ -208,6 +209,24 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &40594927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40594924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ba6fd75b2b4ce44fb40e2a798b74e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bottleColors:
+  - {r: 0.8867924, g: 0, b: 0.4974439, a: 0.70980394}
+  - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
+  - {r: 0.13163044, g: 0.8018868, b: 0.7953835, a: 0}
+  - {r: 0.55805445, g: 0, b: 1, a: 0.8392157}
+  bottleMaskSR: {fileID: 40594926}
 --- !u!1 &163160354
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,9 +255,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 40594925}
   - {fileID: 669160458}
   - {fileID: 410139647}
-  - {fileID: 40594925}
   m_Father: {fileID: 241441225}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -447,6 +466,7 @@ GameObject:
   - component: {fileID: 293086871}
   - component: {fileID: 293086873}
   - component: {fileID: 293086872}
+  - component: {fileID: 293086874}
   m_Layer: 5
   m_Name: Table
   m_TagString: Untagged
@@ -512,6 +532,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 293086870}
   m_CullTransparentMesh: 1
+--- !u!114 &293086874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293086870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ba6fd75b2b4ce44fb40e2a798b74e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bottleColors: []
+  bottleMaskSR: {fileID: 0}
 --- !u!1 &410139646
 GameObject:
   m_ObjectHideFlags: 0
@@ -607,7 +641,6 @@ GameObject:
   m_Component:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
-  - component: {fileID: 519420029}
   - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
@@ -616,14 +649,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &519420029
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -828,6 +853,7 @@ GameObject:
   m_Component:
   - component: {fileID: 669160458}
   - component: {fileID: 669160459}
+  - component: {fileID: 669160460}
   m_Layer: 0
   m_Name: Bottle (1)
   m_TagString: Untagged
@@ -903,6 +929,24 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &669160460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669160457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ba6fd75b2b4ce44fb40e2a798b74e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bottleColors:
+  - {r: 0.6415094, g: 0.14161621, b: 0.14161621, a: 0.80784315}
+  - {r: 0.9056604, g: 0.2853684, b: 0.2853684, a: 0.58431375}
+  - {r: 0.7075472, g: 0.10946951, b: 0.10946951, a: 0}
+  - {r: 0.9245283, g: 0.3087575, b: 0.3087575, a: 1}
+  bottleMaskSR: {fileID: 669160459}
 --- !u!1 &1892887628
 GameObject:
   m_ObjectHideFlags: 0

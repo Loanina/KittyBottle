@@ -1,18 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
+using ModestTree;
 using UnityEngine;
 
-public class BottleController : MonoBehaviour
+namespace Scenes.GameScene
 {
-    // Start is called before the first frame update
-    void Start()
+    public class BottleController : MonoBehaviour
     {
-        
-    }
+        [SerializeField] private Color[] bottleColors;
+        [SerializeField] private SpriteRenderer bottleMaskSR;
 
-    // Update is called once per frame
-    void Update()
-    {
+        void UpdateColorsOnShader()
+        {
+            Debug.Log("<color=red>Вызвана функция смены цветов</color>");
+            foreach (var bottleColor in bottleColors)
+            {
+                try
+                {
+                    bottleMaskSR.material.SetColor("_Color" + (bottleColors.IndexOf(bottleColor)+1), bottleColor);
+                }
+                catch (UnityException)
+                {
+                    Debug.Log("Color" + (bottleColors.IndexOf(bottleColor)+1) +" wasn't set :P");
+                }
+            }
+        }
         
+        // Убрать всю хуйню как выстроишь архитектуру
+        void Start()
+        {
+            UpdateColorsOnShader();
+        }
     }
 }
