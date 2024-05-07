@@ -54,6 +54,31 @@ namespace Scenes.GameScene
             transform.eulerAngles = new Vector3(0, 0, angleValue);
             bottleMaskSR.material.SetFloat("_ScaleAndRotationMultiplyProperty", scaleAndRotationMultiplierCurve.Evaluate(angleValue));
             bottleMaskSR.material.SetFloat("_FillAmount",fillAmountCurve.Evaluate(angleValue));
+
+            StartCoroutine(RotateBottleBack());
+        }
+
+        IEnumerator RotateBottleBack()
+        {
+            float time = 0;
+            float lerpValue;
+            float angleValue;
+            while (time < timeRotation)
+            {
+                lerpValue = time / timeRotation;
+                angleValue = Mathf.Lerp(90.0f, 0.0f, lerpValue);
+
+                transform.eulerAngles = new Vector3(0, 0, angleValue);
+                bottleMaskSR.material.SetFloat("_ScaleAndRotationMultiplyProperty", scaleAndRotationMultiplierCurve.Evaluate(angleValue));
+
+                time += Time.deltaTime;
+
+                yield return new WaitForEndOfFrame();
+            }
+
+            angleValue = 0.0f;
+            transform.eulerAngles = new Vector3(0, 0, angleValue);
+            bottleMaskSR.material.SetFloat("_ScaleAndRotationMultiplyProperty", scaleAndRotationMultiplierCurve.Evaluate(angleValue));
         }
         
         // Убрать всю хуйню как выстроишь архитектуру
