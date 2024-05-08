@@ -15,18 +15,67 @@ namespace Scenes.GameScene
         [SerializeField] private AnimationCurve fillAmountCurve;
         [SerializeField] private AnimationCurve rotationSpeedMultiplier;
 
-        void UpdateColorsOnShader()
+        [SerializeField] private float[] fillAmountValues;
+        [SerializeField] private float[] rotationValues;
+        
+        private int rotationIndex = 0;
+
+        //хз зачем отдельно создавать сериализованным и почему 4 цвета, это абсолютно не гибко, но для других значений
+        //и бутылок необходимо будет узнавать свои значения для кривых, это я сделаю потом
+        [Range(0,4)]
+        [SerializeField] private int numberOfColorsInBottle = 4;
+        
+        //это я так понимаб чисто для дебага
+        [SerializeField] private Color topColor;
+        [SerializeField] private int numberOfTopColorLayers = 1;
+
+        //numberOfColorsInBottle должно считаться автоматом а не ручками индус хуйню пишет, лучше сразу все переписывать
+        //чем потом в болоте сидеть эти лестницы ломать
+        void UpdateTopColorValues()
         { 
-            foreach (var bottleColor in bottleColors)
+            if (numberOfColorsInBottle != 0)
             {
-                try
+                numberOfTopColorLayers = 1;
+                topColor = bottleColors[numberOfColorsInBottle - 1];
+
+                if (numberOfColorsInBottle != 1)
                 {
-                    bottleMaskSR.material.SetColor("_Color" + (bottleColors.IndexOf(bottleColor)+1), bottleColor);
+                    for (var i = numberOfColorsInBottle; i > 0; i--){
+                        if (bottleColors[i - 1].Equals(bottleColors[i - 2]))
+                        {
+                            numberOfTopColorLayers++;
+                        }
+                        else break;
+                    }
                 }
-                catch (UnityException)
+            }
+        }
+        
+        void UpdateColorsOnShader()
+        {
+            try
+            {
+                if (bottleColors.Length == 0)
                 {
-                    Debug.Log("Color" + (bottleColors.IndexOf(bottleColor)+1) +" wasn't set :P");
+                    Debug.Log("bottleColors array is empty! Update Colors failed");
+                    return;
                 }
+                for (var i = bottleColors.Length - 1; i >= 0; i--)
+                {
+                    try
+                    {
+                        bottleMaskSR.material.SetColor("_Color" + (i + 1), bottleColors[i]);
+                        Debug.Log("Цвет " + (i + 1) + " установлен");
+                    }
+                    catch (UnityException)
+                    {
+                        Debug.Log("Color" + (i + 1) + " wasn't set :P");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
             }
         }
 
@@ -43,7 +92,11 @@ namespace Scenes.GameScene
 
                 transform.eulerAngles = new Vector3(0, 0, angleValue);
                 bottleMaskSR.material.SetFloat("_ScaleAndRotationMultiplyProperty", scaleAndRotationMultiplierCurve.Evaluate(angleValue));
-                bottleMaskSR.material.SetFloat("_FillAmount",fillAmountCurve.Evaluate(angleValue));
+                
+                if (fillAmountValues[numberOfColorsInBottle] > fillAmountCurve.Evaluate(angleValue))
+                {
+                    bottleMaskSR.material.SetFloat("_FillAmount",fillAmountCurve.Evaluate(angleValue));
+                }
 
                 time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
 
@@ -84,7 +137,11 @@ namespace Scenes.GameScene
         // Убрать всю хуйню как выстроишь архитектуру
         void Start()
         {
+            bottleMaskSR.material.SetFloat("_FillAmount", fillAmountValues[numberOfColorsInBottle]);
+            
             UpdateColorsOnShader();
+            
+            UpdateTopColorValues();
         }
 
         private void Update()
