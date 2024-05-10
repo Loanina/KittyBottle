@@ -227,7 +227,7 @@ MonoBehaviour:
   - {r: 0.13163044, g: 0.8018868, b: 0.7953835, a: 1}
   - {r: 0.13163044, g: 0.8018868, b: 0.7953835, a: 1}
   bottleMaskSR: {fileID: 614091362}
-  timeRotation: 7
+  timeRotation: 2
   scaleAndRotationMultiplierCurve:
     serializedVersion: 2
     m_Curve:
@@ -388,13 +388,12 @@ MonoBehaviour:
   - 0.26
   - 0.68
   rotationValues:
+  - 0
   - 67.5
   - 78.75
   - 85.6
   - 90
-  numberOfColorsInBottle: 4
-  topColor: {r: 0, g: 0, b: 0, a: 0}
-  numberOfTopColorLayers: 1
+  maxColorsInBottle: 4
 --- !u!1 &163160354
 GameObject:
   m_ObjectHideFlags: 0
@@ -956,9 +955,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ba6fd75b2b4ce44fb40e2a798b74e80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bottleColors: []
+  bottleColors:
+  - {r: 0, g: 0, b: 0, a: 0}
+  - {r: 0, g: 0, b: 0, a: 0}
+  - {r: 1, g: 0.63452065, b: 0, a: 0}
+  - {r: 1, g: 0.21883906, b: 0, a: 0}
   bottleMaskSR: {fileID: 1750415543}
-  timeRotation: 7
+  timeRotation: 2
   scaleAndRotationMultiplierCurve:
     serializedVersion: 2
     m_Curve:
@@ -1119,13 +1122,12 @@ MonoBehaviour:
   - 0.26
   - 0.68
   rotationValues:
+  - 0
   - 67.5
   - 78.75
   - 85.6
   - 90
-  numberOfColorsInBottle: 4
-  topColor: {r: 0, g: 0, b: 0, a: 0}
-  numberOfTopColorLayers: 1
+  maxColorsInBottle: 4
 --- !u!212 &1490695419
 SpriteRenderer:
   m_ObjectHideFlags: 0
