@@ -101,6 +101,7 @@ namespace Scenes.GameScene
             float angleValue;
             float lastAngleValue = 0;
             
+            
             Debug.Log("ROTATION INDEX "+ rotationIndex);
             
             while (time < timeRotation)
@@ -111,6 +112,7 @@ namespace Scenes.GameScene
                 //если rotation index = 0 устроить анимашку и запрет на поворот бутылки
 
                // transform.eulerAngles = new Vector3(0, 0, angleValue);
+               
                
                 transform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
                
@@ -228,15 +230,13 @@ namespace Scenes.GameScene
         {
             if (transform.position.x > bottleControllerRef.transform.position.x)
             {
-                chosenRotationPoint = leftRotationPoint;
+                chosenRotationPoint = leftRotationPoint + transform.position;
                 directionMultiplier = -1.0f;
-                Debug.Log("left rotate");
             }
             else
             {
-                chosenRotationPoint = rightRotationPoint;
+                chosenRotationPoint = rightRotationPoint + transform.position;
                 directionMultiplier = 1.0f;
-                Debug.Log("right rotate");
             }
         }
     }
