@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using Scenes.GameScene;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Bottle : MonoBehaviour
 {
-    [SerializeField] private BottleController shaderController;
+    [FormerlySerializedAs("shaderController")] [SerializeField] private BottleShaderController shaderShaderController;
     [SerializeField] private float timeRotation = 1.0f;
     [SerializeField] private float[] rotationValues = {0.0f, 67.5f, 78.75f, 85.6f, 90.0f};
     [SerializeField] private AnimationCurve rotationSpeedMultiplier;
@@ -19,12 +20,12 @@ public class Bottle : MonoBehaviour
     
     private float directionMultiplier = 1.0f;
 
-    private void Start()
+    public void Initialize(List<Color> bottleColors)
     {
-        shaderController.Initialize();
+        shaderShaderController.Initialize(bottleColors);
     }
 
-    private IEnumerator RotateBottle()
+    private IEnumerator RotateBottle(Bottle targetBottle)
     {
         float time = 0;
         float lerpValue;
@@ -38,7 +39,7 @@ public class Bottle : MonoBehaviour
             
             transform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
                
-           shaderController.RotateShader(angleValue, lastAngleValue);
+           shaderShaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
 
             time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
             lastAngleValue = angleValue;
@@ -46,7 +47,7 @@ public class Bottle : MonoBehaviour
         }
 
         angleValue = directionMultiplier * rotationValues[rotationIndex];
-        shaderController.RotationShaderComplete(angleValue);
+        shaderShaderController.RotationShaderComplete(angleValue);
 
         StartCoroutine(RotateBottleBack());
     }
@@ -66,7 +67,7 @@ public class Bottle : MonoBehaviour
             //transform.eulerAngles = new Vector3(0, 0, angleValue);
             transform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
                 
-            shaderController.RotateShaderBack(angleValue);
+            shaderShaderController.RotateShaderBack(angleValue);
 
             lastAngleValue = angleValue;
                 
@@ -77,7 +78,7 @@ public class Bottle : MonoBehaviour
 
         angleValue = 0.0f;
         transform.eulerAngles = new Vector3(0, 0, angleValue);
-        shaderController.RotateShaderBack(angleValue);
+        shaderShaderController.RotateShaderBack(angleValue);
             
        // UpdateTopColorValues(); наврн не нужно
     }
@@ -95,4 +96,13 @@ public class Bottle : MonoBehaviour
             directionMultiplier = 1.0f;
         }
     }*/
+   public void FillUp(float fillUpToAdd)
+   {
+       shaderShaderController.FillUp(fillUpToAdd);
+   }
+
+   public void AddColor(int count, Color color)
+   {
+       shaderShaderController.AddColor(count, color);
+   }
 }

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 namespace Scenes.GameScene
 {
-    public class BottleController : MonoBehaviour
+    public class BottleShaderController : MonoBehaviour
     {
-        [SerializeField] private List<Color> bottleColors;
+        private List<Color> _bottleColors;
         [SerializeField] private SpriteRenderer bottleMaskSR;
         
 
@@ -29,27 +30,27 @@ namespace Scenes.GameScene
         private int numberOfTopColorLayers = 1;
 
         //можно будет убрать
-        [SerializeField] private BottleController bottleControllerRef;
+      
         [SerializeField] private bool justThisBottle = false;
         private int numberOfColorsToTransfer = 0;
 
 
         private void UpdateTopColorValues()
         {
-            if (bottleColors.Count == 0)
+            if (_bottleColors.Count == 0)
             {
                 numberOfTopColorLayers = 0;
             }
             else
             {
                 numberOfTopColorLayers = 1;
-                topColor = bottleColors[^1];
+                topColor = _bottleColors[^1];
                 
-                if (bottleColors.Count > 1)
+                if (_bottleColors.Count > 1)
                 {
-                    for (var i = bottleColors.Count - 1; i > 0; i--)
+                    for (var i = _bottleColors.Count - 1; i > 0; i--)
                     {
-                        if (bottleColors[i].Equals(bottleColors[i - 1]))
+                        if (_bottleColors[i].Equals(_bottleColors[i - 1]))
                         {
                             numberOfTopColorLayers++;
                         }
@@ -66,16 +67,16 @@ namespace Scenes.GameScene
         {
             try
             {
-                if (bottleColors.Count == 0)
+                if (_bottleColors.Count == 0)
                 {
                     Debug.Log("bottleColors array is empty! Update Colors failed");
                     return;
                 }
-                for (var i = bottleColors.Count - 1; i >= 0; i--)
+                for (var i = _bottleColors.Count - 1; i >= 0; i--)
                 {
                     try
                     {
-                        bottleMaskSR.material.SetColor("_Color" + (i + 1), bottleColors[i]);
+                        bottleMaskSR.material.SetColor("_Color" + (i + 1), _bottleColors[i]);
                     }
                     catch (UnityException)
                     {
@@ -90,39 +91,40 @@ namespace Scenes.GameScene
         }
 
         //переписать индус код на нормальный
-       
 
-        private void RotationShaderComplete(float angleValue)
+
+        public void RotationShaderComplete(float angleValue)
         {
             bottleMaskSR.material.SetFloat("_ScaleAndRotationMultiplyProperty", scaleAndRotationMultiplierCurve.Evaluate(angleValue));
             bottleMaskSR.material.SetFloat("_FillAmount",fillAmountCurve.Evaluate(angleValue));
             
-            bottleColors.RemoveRange(bottleColors.Count - numberOfColorsToTransfer,numberOfColorsToTransfer);
+            _bottleColors.RemoveRange(_bottleColors.Count - numberOfColorsToTransfer,numberOfColorsToTransfer);
             UpdateTopColorValues();
         }
 
-        private void RotateShader(float angleValue, float lastAngleValue)
+        public void RotateShader(float angleValue, float lastAngleValue, Bottle targetBottle)
         {
             bottleMaskSR.material.SetFloat("_ScaleAndRotationMultiplyProperty", scaleAndRotationMultiplierCurve.Evaluate(angleValue));
 
-            if (fillAmountValues[bottleColors.Count] > fillAmountCurve.Evaluate(angleValue))
+            if (fillAmountValues[_bottleColors.Count] > fillAmountCurve.Evaluate(angleValue))
             {
                 bottleMaskSR.material.SetFloat("_FillAmount",fillAmountCurve.Evaluate(angleValue));
 
-                bottleControllerRef.FillUp(fillAmountCurve.Evaluate(lastAngleValue) -
+                targetBottle.FillUp(fillAmountCurve.Evaluate(lastAngleValue) -
                                            fillAmountCurve.Evaluate(angleValue));
             }
         }
 
-        private void RotateShaderBack(float angleValue)
+        public void RotateShaderBack(float angleValue)
         {
             bottleMaskSR.material.SetFloat("_ScaleAndRotationMultiplyProperty",
                 scaleAndRotationMultiplierCurve.Evaluate(angleValue));
         }
         
-        public void Initialize()
+        public void Initialize(List<Color> bottleColors)
         {
-            bottleMaskSR.material.SetFloat("_FillAmount", fillAmountValues[bottleColors.Count]);
+            _bottleColors = bottleColors;
+            bottleMaskSR.material.SetFloat("_FillAmount", fillAmountValues[_bottleColors.Count]);
             
             UpdateColorsOnShader();
             
@@ -146,29 +148,29 @@ namespace Scenes.GameScene
         }
         */
 
-        private void AddTopColorToAnother()
+        public void AddColor(int count, Color color)
         {
-            numberOfColorsToTransfer = Mathf.Min(numberOfTopColorLayers,
-                bottleControllerRef.maxColorsInBottle - bottleControllerRef.bottleColors.Count);
+            numberOfColorsToTransfer = Mathf.Min(count,
+                maxColorsInBottle - _bottleColors.Count);
             for (var i = numberOfColorsToTransfer; i > 0; i--)
             {
-                bottleControllerRef.bottleColors.Add(topColor);
+                _bottleColors.Add(color);
             }
-            bottleControllerRef.UpdateColorsOnShader();
-            bottleControllerRef.UpdateTopColorValues();
+            UpdateColorsOnShader();
+            UpdateTopColorValues();
         }
 
         private bool EnableToFillBottle(Color color)
         {
-            return bottleColors.Count==0 || (color.Equals(topColor) && maxColorsInBottle - bottleColors.Count > 0);
+            return _bottleColors.Count==0 || (color.Equals(topColor) && maxColorsInBottle - _bottleColors.Count > 0);
         }
 
         public int CalculateRotationIndexToAnotherBottle()
         {
-            return maxColorsInBottle - bottleColors.Count + numberOfColorsToTransfer;
+            return maxColorsInBottle - _bottleColors.Count + numberOfColorsToTransfer;
         }
 
-        private void FillUp(float fillAmountToAdd)
+        public void FillUp(float fillAmountToAdd)
         {
             bottleMaskSR.material.SetFloat("_FillAmount",
                 bottleMaskSR.material.GetFloat("_FillAmount") + fillAmountToAdd);
