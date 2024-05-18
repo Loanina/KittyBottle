@@ -1,18 +1,16 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Scenes.GameScene;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Bottle : MonoBehaviour
 {
-    [FormerlySerializedAs("shaderController")] [SerializeField] private BottleShaderController shaderShaderController;
+    [SerializeField] private BottleShaderController shaderController;
     [SerializeField] private float timeRotation = 1.0f;
     [SerializeField] private float[] rotationValues = {0.0f, 67.5f, 78.75f, 85.6f, 90.0f};
     [SerializeField] private AnimationCurve rotationSpeedMultiplier;
     
-    private int rotationIndex = 0; //
+    private int rotationIndex = 0;
     
     public Vector3 leftRotationPoint = new(-0.25f, 1.0f, 0.0f);
     public Vector3 rightRotationPoint = new(0.25f, 1.0f, 0.0f);
@@ -22,11 +20,17 @@ public class Bottle : MonoBehaviour
 
     public void Initialize(List<Color> bottleColors)
     {
-        shaderShaderController.Initialize(bottleColors);
+        shaderController.Initialize(bottleColors);
     }
 
+    public void StartRotate(Bottle targetBottle)
+    {
+        StartCoroutine(RotateBottle(targetBottle));
+    }
+    
     private IEnumerator RotateBottle(Bottle targetBottle)
     {
+        rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle();
         float time = 0;
         float lerpValue;
         float angleValue;
@@ -36,18 +40,16 @@ public class Bottle : MonoBehaviour
         {
             lerpValue = time / timeRotation;
             angleValue = Mathf.Lerp(0.0f,directionMultiplier * rotationValues[rotationIndex], lerpValue);
-            
             transform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
                
-           shaderShaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
+            shaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
 
             time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
             lastAngleValue = angleValue;
             yield return new WaitForEndOfFrame();
         }
-
         angleValue = directionMultiplier * rotationValues[rotationIndex];
-        shaderShaderController.RotationShaderComplete(angleValue);
+        shaderController.RotateShaderComplete(angleValue);
 
         StartCoroutine(RotateBottleBack());
     }
@@ -63,29 +65,23 @@ public class Bottle : MonoBehaviour
         {
             lerpValue = time / timeRotation;
             angleValue = Mathf.Lerp(directionMultiplier * rotationValues[rotationIndex], 0.0f, lerpValue);
-
-            //transform.eulerAngles = new Vector3(0, 0, angleValue);
             transform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
                 
-            shaderShaderController.RotateShaderBack(angleValue);
+            shaderController.RotateShaderBack(angleValue);
 
             lastAngleValue = angleValue;
-                
             time += Time.deltaTime;
-
             yield return new WaitForEndOfFrame();
         }
 
         angleValue = 0.0f;
         transform.eulerAngles = new Vector3(0, 0, angleValue);
-        shaderShaderController.RotateShaderBack(angleValue);
-            
-       // UpdateTopColorValues(); наврн не нужно
+        shaderController.RotateShaderBack(angleValue);
     }
     
-   /* private void ChooseRotationPointAndDirection()
+    public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
     {
-        if (transform.position.x > bottleControllerRef.transform.position.x)
+        if (transform.position.x > positionOfTargetBottleX)
         {
             chosenRotationPoint = leftRotationPoint + transform.position;
             directionMultiplier = -1.0f;
@@ -95,14 +91,35 @@ public class Bottle : MonoBehaviour
             chosenRotationPoint = rightRotationPoint + transform.position;
             directionMultiplier = 1.0f;
         }
-    }*/
+    }
+    
    public void FillUp(float fillUpToAdd)
    {
-       shaderShaderController.FillUp(fillUpToAdd);
+       shaderController.FillUp(fillUpToAdd);
    }
 
    public void AddColor(int count, Color color)
    {
-       shaderShaderController.AddColor(count, color);
+       shaderController.AddColor(count, color);
+   }
+
+   public bool EnableToFillBottle(Color color)
+   {
+       return shaderController.EnableToFillBottle(color);
+   }
+
+   public Color GetTopColor()
+   {
+       return shaderController.TopColor;
+   }
+
+   public bool IsBottleEmpty()
+   {
+       return shaderController.IsBottleEmpty();
+   }
+
+   public int GetNumberOfTopColorLayers()
+   {
+       return shaderController.NumberOfTopColorLayers;
    }
 }
