@@ -1,58 +1,72 @@
 using System;
 using UnityEngine;
 
-public class BottlesController : MonoBehaviour
+namespace Scenes.GameScene
 {
-    private Bottle firstBottle;
-    private Bottle secondBottle;
-
-    public void OnClickBottle(Bottle bottle)
+    public class BottlesController : MonoBehaviour
     {
-        try
+        private Bottle firstBottle;
+        private Bottle secondBottle;
+
+        public void OnClickBottle(Bottle bottle)
         {
-            Debug.Log("Нажалось");
-            if (bottle == null) return;
-            if (firstBottle == null)
+            try
             {
-                firstBottle = bottle;
-            }
-            else if (firstBottle == bottle)
-            {
-                ClearSelection();
-            }
-            else
-            {
-                secondBottle = bottle;
+                if (bottle == null)
+                {
+                    Debug.Log("bottle empty");
+                    return;
+                }
+                if (firstBottle == null)
+                {
+                    firstBottle = bottle;
+                    Debug.Log("first bottle selected");
+                }
+                else if (firstBottle == bottle)
+                {
+                    ClearSelection();
+                    Debug.Log("selected bottle equals");
+                }
+                else
+                {
+                    Debug.Log("2 bottles selected");
+                    secondBottle = bottle;
                 
-                TransferColor();
+                    TransferColor();
 
-                ClearSelection();
+                    ClearSelection();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                throw;
             }
         }
-        catch (Exception e)
+
+        private void ClearSelection()
         {
-            Debug.Log(e);
-            throw;
+            firstBottle = null;
+            secondBottle = null;
         }
-    }
 
-    private void ClearSelection()
-    {
-        firstBottle = null;
-        secondBottle = null;
-    }
+        private bool EnableToTransferColor()
+        {
+            Debug.Log(
+                $"is empty {firstBottle.IsBottleEmpty()} enable to fill second bottle {secondBottle.EnableToFillBottle(firstBottle.GetTopColor())}");
+            return !firstBottle.IsBottleEmpty() && secondBottle.EnableToFillBottle(firstBottle.GetTopColor());
+        }
 
-    private bool EnableToTransferColor()
-    {
-        return !firstBottle.IsBottleEmpty() && secondBottle.EnableToFillBottle(firstBottle.GetTopColor());
-    }
+        private void TransferColor()
+        {
+            if (!EnableToTransferColor()) return;
 
-    private void TransferColor()
-    {
-        if (!EnableToTransferColor()) return;
-        secondBottle.AddColor(firstBottle.GetNumberOfTopColorLayers(), firstBottle.GetTopColor());
+            var countOfColorToTransfer = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
+            Debug.Log($"count of colors to transfer {countOfColorToTransfer}");
             
-        firstBottle.ChooseRotationPointAndDirection(secondBottle.transform.position.x);
-        firstBottle.StartRotate(secondBottle);
+            secondBottle.AddColor(countOfColorToTransfer, firstBottle.GetTopColor());
+            firstBottle.ChooseRotationPointAndDirection(secondBottle.transform.position.x);
+            firstBottle.StartRotate(secondBottle, countOfColorToTransfer);
+        }
     }
 }

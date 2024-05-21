@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 163160355}
   - component: {fileID: 163160356}
   - component: {fileID: 163160357}
+  - component: {fileID: 163160358}
   m_Layer: 5
   m_Name: Map
   m_TagString: Untagged
@@ -379,6 +380,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   bottlePrefab: {fileID: 5536597616313565742, guid: 5462f27f09b293448ab933837c37404f, type: 3}
+  bottlesController: {fileID: 163160358}
 --- !u!114 &163160357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -403,6 +405,18 @@ MonoBehaviour:
   m_Spacing: {x: 277.6, y: 30}
   m_Constraint: 0
   m_ConstraintCount: 2
+--- !u!114 &163160358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163160354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa7ce42e8545cf5419f79c1d711ede45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &241441221
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,7 +452,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!114 &241441223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,8 +511,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 163160355}
   - {fileID: 293086871}
+  - {fileID: 163160355}
   - {fileID: 252546824}
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -644,7 +658,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.4245283, g: 0.25391597, b: 0.25391597, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
