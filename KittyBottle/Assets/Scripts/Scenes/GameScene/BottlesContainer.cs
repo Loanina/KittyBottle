@@ -1,30 +1,34 @@
 using System.Collections.Generic;
-using Scenes.GameScene;
 using Sirenix.OdinInspector;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class BottlesContainer : SerializedMonoBehaviour
+namespace Scenes.GameScene
 {
-    [SerializeField] private Bottle bottlePrefab;
-    [SerializeField] private List<List<Color>> levelColors;
-    [SerializeField] private BottlesController bottlesController;
-    private List<Bottle> bottles;
-
-    private void CreateBottles()
+    public class BottlesContainer : SerializedMonoBehaviour
     {
-        bottles = new List<Bottle>();
-        foreach (var bottleColors in levelColors)
+        [SerializeField] private Bottle bottlePrefab;
+        [SerializeField] private List<List<Color>> levelColors;
+        [SerializeField] private BottlesController bottlesController;
+        private List<Bottle> bottles;
+
+        private void CreateBottles()
         {
-            var bottle = Instantiate(bottlePrefab, transform);
-            bottle.Initialize(bottleColors);
-            bottles.Add(bottle);
-            bottle.OnClickEvent += bottlesController.OnClickBottle;
+            bottles = new List<Bottle>();
+            foreach (var bottleColors in levelColors)
+            {
+                var bottle = Instantiate(bottlePrefab, transform);
+                bottle.Initialize(bottleColors);
+                bottles.Add(bottle);
+                bottle.OnClickEvent += bottlesController.OnClickBottle;
+            }
         }
-    }
 
-    private void Start()
-    {
-        CreateBottles();
+        private void Start()
+        {
+            CreateBottles();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
+            bottles.ForEach(bottle => bottle.SetDefaultPosition());
+        }
     }
 }

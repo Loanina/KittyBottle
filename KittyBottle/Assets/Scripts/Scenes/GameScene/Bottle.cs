@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 namespace Scenes.GameScene
@@ -8,22 +9,32 @@ namespace Scenes.GameScene
     public class Bottle : MonoBehaviour
     {
         [SerializeField] private BottleShaderController shaderController;
-        [SerializeField] private float timeRotation = 1.0f;
         [SerializeField] private float[] rotationValues = {0.0f, 67.5f, 78.75f, 85.6f, 90.0f};
         [SerializeField] private AnimationCurve rotationSpeedMultiplier;
+        [SerializeField] private Transform rightPouringPoint;
+        [SerializeField] private Transform leftPouringPoint;
+        [SerializeField] private Transform rightRotationPoint;
+        [SerializeField] private Transform leftRotationPoint;
+        [SerializeField] private float timeRotation = 1.0f;
+        [SerializeField] private float timeMove = 1.5f;
     
         private int rotationIndex;
-    
-        public Vector3 leftRotationPoint = new(-0.25f, 1.0f, 0.0f);
-        public Vector3 rightRotationPoint = new(0.25f, 1.0f, 0.0f);
-        private Vector3 chosenRotationPoint;
         private float directionMultiplier = 1.0f;
-
+        private Transform chosenRotationPoint;
+        private Vector3 chosenPouringPoint;
+        private Vector3 defaultPosition;
+        
         public event Action<Bottle> OnClickEvent; 
 
         public void Initialize(List<Color> bottleColors)
         {
             shaderController.Initialize(bottleColors);
+        }
+
+        public void SetDefaultPosition()
+        {
+            defaultPosition = transform.position;
+            Debug.Log($"def pos in init {defaultPosition}");
         }
 
         public void StartRotate(Bottle targetBottle, int countOfColorToTransfer)
@@ -42,8 +53,7 @@ namespace Scenes.GameScene
             {
                 var lerpValue = time / timeRotation;
                 angleValue = Mathf.Lerp(0.0f,directionMultiplier * rotationValues[rotationIndex], lerpValue);
-                transform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
-               
+                transform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
 
                 time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
@@ -52,8 +62,6 @@ namespace Scenes.GameScene
             }
             angleValue = directionMultiplier * rotationValues[rotationIndex];
             shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
-
-            StartCoroutine(RotateBottleBack());
         }
     
         private IEnumerator RotateBottleBack()
@@ -66,8 +74,7 @@ namespace Scenes.GameScene
             {
                 var lerpValue = time / timeRotation;
                 angleValue = Mathf.Lerp(directionMultiplier * rotationValues[rotationIndex], 0.0f, lerpValue);
-                transform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
-                
+                transform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShaderBack(angleValue);
                 
                 lastAngleValue = angleValue;
@@ -83,16 +90,29 @@ namespace Scenes.GameScene
         {
             if (transform.position.x > positionOfTargetBottleX)
             {
-                chosenRotationPoint = leftRotationPoint + transform.position;
+                chosenRotationPoint = leftRotationPoint;
+                chosenPouringPoint = rightPouringPoint.localPosition;
                 directionMultiplier = -1.0f;
             }
             else
             {
-                chosenRotationPoint = rightRotationPoint + transform.position;
+                chosenRotationPoint = rightRotationPoint;
+                chosenPouringPoint = leftPouringPoint.localPosition;
                 directionMultiplier = 1.0f;
             }
         }
-    
+        
+        public void GoUp()
+        {
+            transform.DOMoveY(defaultPosition.y + 0.20f, timeMove);
+        }
+
+        public void GoToStartPosition()
+        {
+            transform.DOMove(defaultPosition, timeMove);
+            Debug.Log($"go to default position --- {defaultPosition}");
+        }
+        
         public void FillUp(float fillUpToAdd)
         {
             shaderController.FillUp(fillUpToAdd);
@@ -101,6 +121,15 @@ namespace Scenes.GameScene
         public void AddColor(int count, Color color)
         {
             shaderController.AddColor(count, color);
+        }
+
+        public void PouringColorsBetweenBottles(Bottle targetBottle, int countOfColorToTransfer)
+        {
+            var pouringColors = DOTween.Sequence();
+            pouringColors.Append(transform.DOMove(targetBottle.transform.position + chosenPouringPoint, timeMove))
+                .InsertCallback(1, () => StartCoroutine(RotateBottle(targetBottle, countOfColorToTransfer)))
+                .Insert(2, transform.DOMove(defaultPosition, timeMove))
+                .InsertCallback(2, () => StartCoroutine(RotateBottleBack()));
         }
 
         public bool EnableToFillBottle(Color color)

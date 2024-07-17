@@ -112,6 +112,11 @@ namespace Scenes.GameScene
             return maxColorsInBottle - _bottleColors.Count + countOfColorToTransfer;
         }
 
+        public int GetCountOfColor()
+        {
+            return _bottleColors.Count;
+        }
+
         public void FillUp(float fillAmountToAdd)
         {
             bottleMaskSR.material.SetFloat(FillAmount,

@@ -20,10 +20,13 @@ namespace Scenes.GameScene
                 if (firstBottle == null)
                 {
                     firstBottle = bottle;
+                    firstBottle.GoUp();
+                    
                     Debug.Log("first bottle selected");
                 }
                 else if (firstBottle == bottle)
                 {
+                    firstBottle.GoToStartPosition();
                     ClearSelection();
                     Debug.Log("selected bottle equals");
                 }
@@ -31,9 +34,9 @@ namespace Scenes.GameScene
                 {
                     Debug.Log("2 bottles selected");
                     secondBottle = bottle;
-                
+                   
                     TransferColor();
-
+                    
                     ClearSelection();
                 }
             }
@@ -59,14 +62,18 @@ namespace Scenes.GameScene
 
         private void TransferColor()
         {
-            if (!EnableToTransferColor()) return;
+            if (!EnableToTransferColor())
+            {
+                firstBottle.GoToStartPosition();
+                return;
+            }
 
             var countOfColorToTransfer = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
             Debug.Log($"count of colors to transfer {countOfColorToTransfer}");
             
             secondBottle.AddColor(countOfColorToTransfer, firstBottle.GetTopColor());
             firstBottle.ChooseRotationPointAndDirection(secondBottle.transform.position.x);
-            firstBottle.StartRotate(secondBottle, countOfColorToTransfer);
+            firstBottle.PouringColorsBetweenBottles(secondBottle, countOfColorToTransfer);
         }
     }
 }
