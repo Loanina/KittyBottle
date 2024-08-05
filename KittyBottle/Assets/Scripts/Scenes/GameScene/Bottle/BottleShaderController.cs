@@ -112,6 +112,11 @@ namespace Scenes.GameScene
             return maxColorsInBottle - _bottleColors.Count + countOfColorToTransfer;
         }
 
+        public int CalculateStartPouringIndex()
+        {
+            return maxColorsInBottle - _bottleColors.Count;
+        }
+
         public int GetCountOfColor()
         {
             return _bottleColors.Count;

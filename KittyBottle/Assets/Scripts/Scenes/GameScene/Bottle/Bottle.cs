@@ -9,8 +9,9 @@ namespace Scenes.GameScene.Bottle
     public class Bottle : MonoBehaviour
     {
         [SerializeField] private BottleShaderController shaderController;
+        [SerializeField] private PouringAnimationController pouringAnimationController;
         [SerializeField] private Transform glassTransform;
-        [SerializeField] private float[] rotationValues = {0.0f, 67.5f, 78.75f, 85.6f, 90.0f};
+        [SerializeField] private float[] rotationValues = {33.0f, 67.5f, 78.75f, 85.6f, 90.0f};
         [SerializeField] private AnimationCurve rotationSpeedMultiplier;
         [SerializeField] private Transform rightPouringPoint;
         [SerializeField] private Transform leftPouringPoint;
@@ -46,6 +47,8 @@ namespace Scenes.GameScene.Bottle
         private IEnumerator RotateBottle(Bottle targetBottle, int countOfColorToTransfer)
         {
             rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle(countOfColorToTransfer);
+            var startPouringAngle = rotationValues[shaderController.CalculateStartPouringIndex()];
+            var pouringAnimationStarted = false;
             float time = 0;
             float angleValue;
             float lastAngleValue = 0;
@@ -58,11 +61,19 @@ namespace Scenes.GameScene.Bottle
                 glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
 
+                if (!pouringAnimationStarted)
+                {
+                    if (Mathf.Abs(angleValue) >= startPouringAngle)
+                    {
+                        pouringAnimationStarted = true;
+                        pouringAnimationController.DoColorFlow(directionMultiplier > 0.0f, GetTopColor());
+                    }
+                }
                 time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
                 lastAngleValue = angleValue;
-                Debug.Log(angleValue);
                 yield return new WaitForEndOfFrame();
             }
+            pouringAnimationController.RemoveFlow(directionMultiplier > 0.0f);
             angleValue = directionMultiplier * rotationValues[rotationIndex];
             shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
         }
