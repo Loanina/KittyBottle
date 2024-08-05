@@ -5,10 +5,10 @@ namespace Scenes.GameScene
 {
     public class BottlesController : MonoBehaviour
     {
-        private Bottle firstBottle;
-        private Bottle secondBottle;
+        private Bottle.Bottle firstBottle;
+        private Bottle.Bottle secondBottle;
 
-        public void OnClickBottle(Bottle bottle)
+        public void OnClickBottle(Bottle.Bottle bottle)
         {
             try
             {

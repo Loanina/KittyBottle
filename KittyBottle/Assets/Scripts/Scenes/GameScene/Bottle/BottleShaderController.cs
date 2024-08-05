@@ -63,7 +63,7 @@ namespace Scenes.GameScene
             UpdateTopColorValues();
         }
 
-        public void RotateShader(float angleValue, float lastAngleValue, Bottle targetBottle)
+        public void RotateShader(float angleValue, float lastAngleValue, Bottle.Bottle targetBottle)
         {
             bottleMaskSR.material.SetFloat(ScaleAndRotationMultiplyProperty, scaleAndRotationMultiplierCurve.Evaluate(angleValue));
             

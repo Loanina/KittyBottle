@@ -6,7 +6,7 @@ namespace Scenes.GameScene.RaycastSystem
     {
         public void OnSpriteTouched()
         {
-            var bottle = gameObject.GetComponent<Bottle>();
+            var bottle = gameObject.GetComponent<Bottle.Bottle>();
             if (!bottle) return;
             bottle.OnClick();
         }

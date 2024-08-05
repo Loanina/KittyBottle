@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-namespace Scenes.GameScene
+namespace Scenes.GameScene.Bottle
 {
     public class Bottle : MonoBehaviour
     {
         [SerializeField] private BottleShaderController shaderController;
+        [SerializeField] private Transform glassTransform;
         [SerializeField] private float[] rotationValues = {0.0f, 67.5f, 78.75f, 85.6f, 90.0f};
         [SerializeField] private AnimationCurve rotationSpeedMultiplier;
         [SerializeField] private Transform rightPouringPoint;
@@ -53,11 +54,13 @@ namespace Scenes.GameScene
             {
                 var lerpValue = time / timeRotation;
                 angleValue = Mathf.Lerp(0.0f,directionMultiplier * rotationValues[rotationIndex], lerpValue);
-                transform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
+                //transform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
+                glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
 
                 time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
                 lastAngleValue = angleValue;
+                Debug.Log(angleValue);
                 yield return new WaitForEndOfFrame();
             }
             angleValue = directionMultiplier * rotationValues[rotationIndex];
@@ -74,7 +77,8 @@ namespace Scenes.GameScene
             {
                 var lerpValue = time / timeRotation;
                 angleValue = Mathf.Lerp(directionMultiplier * rotationValues[rotationIndex], 0.0f, lerpValue);
-                transform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
+                //transform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
+                glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShaderBack(angleValue);
                 
                 lastAngleValue = angleValue;
@@ -82,7 +86,8 @@ namespace Scenes.GameScene
                 yield return new WaitForEndOfFrame();
             }
             angleValue = 0.0f;
-            transform.eulerAngles = new Vector3(0, 0, angleValue);
+            //transform.eulerAngles = new Vector3(0, 0, angleValue);
+            glassTransform.eulerAngles = new Vector3(0, 0, angleValue);
             shaderController.RotateShaderBack(angleValue);
         }
     

@@ -8,11 +8,11 @@ namespace Scenes.GameScene
 {
     public class BottlesContainer : SerializedMonoBehaviour
     {
-        [SerializeField] private Bottle bottlePrefab;
+        [SerializeField] private Bottle.Bottle bottlePrefab;
         [SerializeField] private List<List<Color>> levelColors;
         [SerializeField] private BottlesController bottlesController;
         [SerializeField] private Dictionary<int, List<Vector3>> layoutSettings;
-        private List<Bottle> bottles;
+        private List<Bottle.Bottle> bottles;
         
         private void CreateBottles()
         {
@@ -26,7 +26,7 @@ namespace Scenes.GameScene
                 bottle.OnClickEvent += bottlesController.OnClickBottle;
             }
             */
-            bottles = new List<Bottle>();
+            bottles = new List<Bottle.Bottle>();
             for (var i = 0; i < levelColors.Count; i++)
             {
                 var position = transform.TransformPoint(layoutSettings[levelColors.Count][i]);
