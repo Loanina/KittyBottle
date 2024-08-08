@@ -1447,7 +1447,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  bottlePrefab: {fileID: 6204199746345193663, guid: 51b9ff9b10afbc949be85e2328b2d806, type: 3}
+  bottlePrefab: {fileID: 8723869106329755495, guid: fe01226f1a5ba3d4caf85f10c062d27a, type: 3}
   bottlesController: {fileID: 1644246530}
 --- !u!114 &1644246530
 MonoBehaviour:
@@ -1866,6 +1866,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderController: {fileID: 2824783917325359969}
+  pouringAnimationController: {fileID: 0}
   glassTransform: {fileID: 0}
   rotationValues:
   - 0
