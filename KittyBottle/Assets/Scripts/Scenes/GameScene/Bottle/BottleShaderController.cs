@@ -73,6 +73,11 @@ namespace Scenes.GameScene
                                 fillAmountCurve.Evaluate(angleValue));
         }
 
+        public void RotateShader(float angleValue)
+        {
+            bottleMaskSR.material.SetFloat(ScaleAndRotationMultiplyProperty, scaleAndRotationMultiplierCurve.Evaluate(angleValue));
+        }
+
         public void RotateShaderBack(float angleValue)
         {
             bottleMaskSR.material.SetFloat(ScaleAndRotationMultiplyProperty,

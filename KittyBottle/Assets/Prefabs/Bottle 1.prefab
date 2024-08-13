@@ -428,8 +428,8 @@ MonoBehaviour:
   leftPouringPoint: {fileID: 2124948379449813473}
   rightRotationPoint: {fileID: 8283083381133557019}
   leftRotationPoint: {fileID: 3581949798412607547}
-  timeRotation: 1
-  timeMove: 1.5
+  timeRotation: 5
+  timeMove: 5
 --- !u!114 &2172642616759441303
 MonoBehaviour:
   m_ObjectHideFlags: 0
