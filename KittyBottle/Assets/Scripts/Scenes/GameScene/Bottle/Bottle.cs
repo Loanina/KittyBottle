@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using DG.Tweening;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Scenes.GameScene.Bottle
 {
@@ -42,11 +44,12 @@ namespace Scenes.GameScene.Bottle
         private IEnumerator RotateBottleWithPouring(Bottle targetBottle, int countOfColorToTransfer)
         {
             Debug.Log("Rotate continue with pouring");
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             
             rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle(countOfColorToTransfer);
             var time = 0.0f;
             float angleValue;
-            
             var firstAngleValue = glassTransform.transform.eulerAngles.z;
             if (firstAngleValue > 180)
             {
@@ -54,79 +57,78 @@ namespace Scenes.GameScene.Bottle
                 firstAngleValue = Mathf.Abs(firstAngleValue);
             }
             firstAngleValue *= directionMultiplier;
-            
             var lastAngleValue = firstAngleValue;
-            Debug.Log($"Glass angle until RotationToAngle: {firstAngleValue}");
-            Debug.Log($"Interpolation b: {directionMultiplier * rotationValues[rotationIndex]}");
-            Debug.Log($"Second turn {Mathf.Lerp(firstAngleValue,directionMultiplier * rotationValues[rotationIndex], 1)}");
-            
             pouringAnimationController.DoColorFlow(directionMultiplier > 0.0f, GetTopColor());
+            
+            stopwatch.Stop();
+            Debug.Log($"Time before timer to pouring :{stopwatch.ElapsedMilliseconds}");
+            stopwatch.Start();
             
             while (time < timeRotation)
             {
                 var lerpValue = time / timeRotation;
-                // angleValue = Mathf.Lerp(0,directionMultiplier * rotationValues[rotationIndex], lerpValue);
                 angleValue = Mathf.Lerp(firstAngleValue,directionMultiplier * rotationValues[rotationIndex], lerpValue);
                 glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
-
-                /*
-                if (!pouringAnimationStarted)
-                {
-                    if (Mathf.Abs(angleValue) >= Mathf.Abs(startPouringAngle))
-                    {
-                        pouringAnimationStarted = true;
-                        pouringAnimationController.DoColorFlow(directionMultiplier > 0.0f, GetTopColor());
-                    }
-                }
-                */
-                time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
+                
+                //time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
+                time += Time.deltaTime;
+                
                 lastAngleValue = angleValue;
                 yield return new WaitForEndOfFrame();
             }
             pouringAnimationController.RemoveFlow(directionMultiplier > 0.0f);
             angleValue = directionMultiplier * rotationValues[rotationIndex];
             shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
+            
+            stopwatch.Stop();
+            Debug.Log($"Time to pouring rotate: {stopwatch.ElapsedMilliseconds} ms. Rotation speed: {timeRotation}");
             Debug.Log("Rotate pouring end");
         }
 
         private IEnumerator RotateBottleToAngle(float finishAngle)
         {
             Debug.Log("Rotate start");
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
             float time = 0;
             float angleValue;
             float lastAngleValue = 0;
-            while (time < timeRotation)
+            while (time < timeMove)
             {
-                var lerpValue = time / timeRotation;
+                var lerpValue = time / timeMove;
                 angleValue = Mathf.Lerp(0.0f,finishAngle, lerpValue);
                 glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue);
                 
-                time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
+                time += Time.deltaTime;
                 lastAngleValue = angleValue;
                 yield return new WaitForEndOfFrame();
             }
-            Debug.Log($"Rotate end, glass transform angle: {glassTransform.transform.eulerAngles.z}");
+            stopwatch.Stop();
+            Debug.Log($"Time for RotateToAngle: {stopwatch.ElapsedMilliseconds} ms. With time to move: {timeMove}");
+            Debug.Log("Rotate to angle end");
         }
     
         private IEnumerator RotateBottleBack()
         {
             Debug.Log($"Start rotate bottle back");
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
             float time = 0;
             float angleValue;
             var firstAngleValue = glassTransform.transform.eulerAngles.z;
             if (firstAngleValue > 180) firstAngleValue -= 360;
             firstAngleValue = Mathf.Abs(firstAngleValue);
             firstAngleValue *= directionMultiplier;
-           // var lastAngleValue = directionMultiplier * rotationValues[rotationIndex];
            var lastAngleValue = firstAngleValue;
             
-            while (time < timeRotation)
+            while (time < timeMove)
             {
-                var lerpValue = time / timeRotation;
+                var lerpValue = time / timeMove;
                 angleValue = Mathf.Lerp(firstAngleValue, 0.0f, lerpValue);
-                //transform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShaderBack(angleValue);
                 
@@ -135,9 +137,11 @@ namespace Scenes.GameScene.Bottle
                 yield return new WaitForEndOfFrame();
             }
             angleValue = 0.0f;
-            //transform.eulerAngles = new Vector3(0, 0, angleValue);
             glassTransform.eulerAngles = new Vector3(0, 0, angleValue);
             shaderController.RotateShaderBack(angleValue);
+            
+            stopwatch.Stop();
+            Debug.Log($"Time to rotation back: {stopwatch.ElapsedMilliseconds} ms. Time move: {timeMove}");
             Debug.Log($"End back rotation");
         }
     
@@ -181,15 +185,13 @@ namespace Scenes.GameScene.Bottle
         public void PouringColorsBetweenBottles(Bottle targetBottle, int countOfColorToTransfer)
         {
             var startPouringAngle = rotationValues[shaderController.CalculateStartPouringIndex()] * directionMultiplier;
-            Debug.Log($"Start pouring angle {startPouringAngle}");
             var pouringColors = DOTween.Sequence();
             
             pouringColors.Append(transform.DOMove(targetBottle.transform.position + chosenPouringPoint, timeMove))
-                .InsertCallback(0, () => StartCoroutine(RotateBottleToAngle(startPouringAngle)))
-                .InsertCallback(10f, () => StartCoroutine(RotateBottleWithPouring(targetBottle, countOfColorToTransfer)))
-                .Insert(20f, transform.DOMove(defaultPosition, timeMove))
-                .InsertCallback(20f, () => StartCoroutine(RotateBottleBack()));
-                
+                .InsertCallback(0.0f, () => StartCoroutine(RotateBottleToAngle(startPouringAngle)))
+                .InsertCallback(timeMove + 0.01f, () => StartCoroutine(RotateBottleWithPouring(targetBottle, countOfColorToTransfer)))
+                .Insert(timeMove + timeRotation + 0.02f, transform.DOMove(defaultPosition, timeMove))
+                .InsertCallback(timeMove + timeRotation + 0.02f, () => StartCoroutine(RotateBottleBack()));
         }
 
         public bool EnableToFillBottle(Color color)
