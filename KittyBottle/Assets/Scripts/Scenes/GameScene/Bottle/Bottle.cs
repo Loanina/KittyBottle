@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using DG.Tweening;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -19,14 +18,16 @@ namespace Scenes.GameScene.Bottle
         [SerializeField] private Transform leftPouringPoint;
         [SerializeField] private Transform rightRotationPoint;
         [SerializeField] private Transform leftRotationPoint;
-        [SerializeField] private float timeRotation = 1.0f;
-        [SerializeField] private float timeMove = 1.5f;
+        [SerializeField] private float timeRotation = 0.7f;
+        [SerializeField] private float timeMove = 0.5f;
     
         private int rotationIndex;
         private float directionMultiplier = 1.0f;
         private Transform chosenRotationPoint;
         private Vector3 chosenPouringPoint;
         private Vector3 defaultPosition;
+        public bool InUse = false;
+        public bool IsFrozen = false;
         
         public event Action<Bottle> OnClickEvent; 
 
@@ -43,10 +44,6 @@ namespace Scenes.GameScene.Bottle
     
         private IEnumerator RotateBottleWithPouring(Bottle targetBottle, int countOfColorToTransfer)
         {
-            Debug.Log("Rotate continue with pouring");
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            
             rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle(countOfColorToTransfer);
             var time = 0.0f;
             float angleValue;
@@ -59,10 +56,6 @@ namespace Scenes.GameScene.Bottle
             firstAngleValue *= directionMultiplier;
             var lastAngleValue = firstAngleValue;
             pouringAnimationController.DoColorFlow(directionMultiplier > 0.0f, GetTopColor());
-            
-            stopwatch.Stop();
-            Debug.Log($"Time before timer to pouring :{stopwatch.ElapsedMilliseconds}");
-            stopwatch.Start();
             
             while (time < timeRotation)
             {
@@ -80,18 +73,13 @@ namespace Scenes.GameScene.Bottle
             pouringAnimationController.RemoveFlow(directionMultiplier > 0.0f);
             angleValue = directionMultiplier * rotationValues[rotationIndex];
             shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
-            
-            stopwatch.Stop();
-            Debug.Log($"Time to pouring rotate: {stopwatch.ElapsedMilliseconds} ms. Rotation speed: {timeRotation}");
-            Debug.Log("Rotate pouring end");
+
+            targetBottle.IsFrozen = false;
+            Debug.Log("second bottle NOT frozen");
         }
 
         private IEnumerator RotateBottleToAngle(float finishAngle)
         {
-            Debug.Log("Rotate start");
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            
             float time = 0;
             float angleValue;
             float lastAngleValue = 0;
@@ -106,17 +94,10 @@ namespace Scenes.GameScene.Bottle
                 lastAngleValue = angleValue;
                 yield return new WaitForEndOfFrame();
             }
-            stopwatch.Stop();
-            Debug.Log($"Time for RotateToAngle: {stopwatch.ElapsedMilliseconds} ms. With time to move: {timeMove}");
-            Debug.Log("Rotate to angle end");
         }
     
         private IEnumerator RotateBottleBack()
         {
-            Debug.Log($"Start rotate bottle back");
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            
             float time = 0;
             float angleValue;
             var firstAngleValue = glassTransform.transform.eulerAngles.z;
@@ -139,10 +120,8 @@ namespace Scenes.GameScene.Bottle
             angleValue = 0.0f;
             glassTransform.eulerAngles = new Vector3(0, 0, angleValue);
             shaderController.RotateShaderBack(angleValue);
-            
-            stopwatch.Stop();
-            Debug.Log($"Time to rotation back: {stopwatch.ElapsedMilliseconds} ms. Time move: {timeMove}");
-            Debug.Log($"End back rotation");
+            InUse = false;
+            Debug.Log("first bottle NOT in use");
         }
     
         public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
