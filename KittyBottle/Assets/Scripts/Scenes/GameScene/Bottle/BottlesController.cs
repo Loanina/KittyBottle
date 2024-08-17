@@ -12,26 +12,12 @@ namespace Scenes.GameScene.Bottle
         {
             try
             {
-                if (bottle == null)
-                {
-                    Debug.Log("bottle empty");
-                    return;
-                }
+                if (bottle == null) return;
                 if (firstBottle == null)
                 {
-                    if (bottle.InUse)
-                    {
-                        Debug.Log("selected bottle in use");
-                        return;
-                    }
-                    if (bottle.IsFrozen)
-                    {
-                        Debug.Log("selected bottle is frozen");
-                        return;
-                    }
+                    if (bottle.InUse || bottle.IsFrozen) return;
                     firstBottle = bottle;
                     firstBottle.GoUp();
-                    
                     Debug.Log("first bottle selected");
                 }
                 else if (firstBottle == bottle)
@@ -42,16 +28,10 @@ namespace Scenes.GameScene.Bottle
                 }
                 else
                 {
-                    if (bottle.InUse)
-                    {
-                        Debug.Log("selected bottle in use");
-                        return;
-                    }
+                    if (bottle.InUse) return;
                     Debug.Log("2 bottles selected");
                     secondBottle = bottle;
-                   
                     TransferColor();
-                    
                     ClearSelection();
                 }
             }
@@ -83,10 +63,7 @@ namespace Scenes.GameScene.Bottle
                 return;
             }
             firstBottle.InUse = true;
-            Debug.Log("first bottle in use");
             secondBottle.IsFrozen = true;
-            Debug.Log("second bottle frozen");
-            
             var countOfColorToTransfer = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
             Debug.Log($"count of colors to transfer {countOfColorToTransfer}");
             secondBottle.AddColor(countOfColorToTransfer, firstBottle.GetTopColor());

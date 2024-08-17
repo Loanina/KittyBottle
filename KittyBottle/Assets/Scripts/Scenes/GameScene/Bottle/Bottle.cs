@@ -26,7 +26,9 @@ namespace Scenes.GameScene.Bottle
         private Transform chosenRotationPoint;
         private Vector3 chosenPouringPoint;
         private Vector3 defaultPosition;
+        [HideInInspector]
         public bool InUse = false;
+        [HideInInspector]
         public bool IsFrozen = false;
         
         public event Action<Bottle> OnClickEvent; 
@@ -73,9 +75,7 @@ namespace Scenes.GameScene.Bottle
             pouringAnimationController.RemoveFlow(directionMultiplier > 0.0f);
             angleValue = directionMultiplier * rotationValues[rotationIndex];
             shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
-
             targetBottle.IsFrozen = false;
-            Debug.Log("second bottle NOT frozen");
         }
 
         private IEnumerator RotateBottleToAngle(float finishAngle)
@@ -104,7 +104,7 @@ namespace Scenes.GameScene.Bottle
             if (firstAngleValue > 180) firstAngleValue -= 360;
             firstAngleValue = Mathf.Abs(firstAngleValue);
             firstAngleValue *= directionMultiplier;
-           var lastAngleValue = firstAngleValue;
+            var lastAngleValue = firstAngleValue;
             
             while (time < timeMove)
             {
@@ -121,7 +121,6 @@ namespace Scenes.GameScene.Bottle
             glassTransform.eulerAngles = new Vector3(0, 0, angleValue);
             shaderController.RotateShaderBack(angleValue);
             InUse = false;
-            Debug.Log("first bottle NOT in use");
         }
     
         public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
