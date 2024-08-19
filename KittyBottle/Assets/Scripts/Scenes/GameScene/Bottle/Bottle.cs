@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Scenes.GameScene.RaycastSystem;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace Scenes.GameScene.Bottle
 {
-    public class Bottle : MonoBehaviour
+    public class Bottle : MonoBehaviour, IClickable
     {
         [SerializeField] private BottleShaderController shaderController;
         [SerializeField] private PouringAnimationController pouringAnimationController;
