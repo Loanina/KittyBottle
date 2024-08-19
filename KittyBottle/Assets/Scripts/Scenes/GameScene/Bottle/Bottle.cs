@@ -29,7 +29,7 @@ namespace Scenes.GameScene.Bottle
         [HideInInspector]
         public bool InUse = false;
         [HideInInspector]
-        public bool IsFrozen = false;
+        public int UsesCount = 0;
         
         public event Action<Bottle> OnClickEvent; 
 
@@ -75,7 +75,7 @@ namespace Scenes.GameScene.Bottle
             pouringAnimationController.RemoveFlow(directionMultiplier > 0.0f);
             angleValue = directionMultiplier * rotationValues[rotationIndex];
             shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
-            targetBottle.IsFrozen = false;
+            targetBottle.UsesCount -= 1;
         }
 
         private IEnumerator RotateBottleToAngle(float finishAngle)

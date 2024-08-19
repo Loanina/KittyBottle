@@ -15,7 +15,7 @@ namespace Scenes.GameScene.Bottle
                 if (bottle == null) return;
                 if (firstBottle == null)
                 {
-                    if (bottle.InUse || bottle.IsFrozen) return;
+                    if (bottle.InUse || bottle.UsesCount > 0) return;
                     firstBottle = bottle;
                     firstBottle.GoUp();
                     Debug.Log("first bottle selected");
@@ -28,7 +28,11 @@ namespace Scenes.GameScene.Bottle
                 }
                 else
                 {
-                    if (bottle.InUse) return;
+                    if (bottle.InUse)
+                    {
+                        Debug.Log("BOTTlE IN USE ohhhhh ssshhhhiiiiiitttt");
+                        return;
+                    }
                     Debug.Log("2 bottles selected");
                     secondBottle = bottle;
                     TransferColor();
@@ -63,7 +67,7 @@ namespace Scenes.GameScene.Bottle
                 return;
             }
             firstBottle.InUse = true;
-            secondBottle.IsFrozen = true;
+            secondBottle.UsesCount += 1;
             var countOfColorToTransfer = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
             Debug.Log($"count of colors to transfer {countOfColorToTransfer}");
             secondBottle.AddColor(countOfColorToTransfer, firstBottle.GetTopColor());
