@@ -126,17 +126,23 @@ namespace Scenes.GameScene.Bottle
     
         public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
         {
-            if (transform.position.x > positionOfTargetBottleX) 
+            if (transform.position.x > positionOfTargetBottleX && transform.localPosition.x <= 0.31) 
             {
                 chosenRotationPoint = leftRotationPoint;
                 chosenPouringPoint = rightPouringPoint.localPosition;
                 directionMultiplier = -1.0f;
             }
-            else
+            else if (transform.localPosition.x >= -0.31)
             {
                 chosenRotationPoint = rightRotationPoint;
                 chosenPouringPoint = leftPouringPoint.localPosition;
                 directionMultiplier = 1.0f;
+            }
+            else
+            {
+                chosenRotationPoint = leftRotationPoint;
+                chosenPouringPoint = rightPouringPoint.localPosition;
+                directionMultiplier = -1.0f;
             }
         }
         
