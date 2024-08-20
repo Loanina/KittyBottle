@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using Scenes.GameScene.RaycastSystem;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Debug = UnityEngine.Debug;
 
 namespace Scenes.GameScene.Bottle
@@ -12,6 +13,7 @@ namespace Scenes.GameScene.Bottle
     {
         [SerializeField] private BottleShaderController shaderController;
         [SerializeField] private PouringAnimationController pouringAnimationController;
+        [SerializeField] private SortingGroup sortingGroup;
         [SerializeField] private Transform glassTransform;
         [SerializeField] private float[] rotationValues = {33.0f, 67.5f, 78.75f, 85.6f, 90.0f};
         [SerializeField] private AnimationCurve rotationSpeedMultiplier;
@@ -32,7 +34,8 @@ namespace Scenes.GameScene.Bottle
         [HideInInspector]
         public int UsesCount = 0;
         
-        public event Action<Bottle> OnClickEvent; 
+        public event Action<Bottle> OnClickEvent;
+        public event Action OnEndPouring;
 
         public void Initialize(List<Color> bottleColors)
         {
@@ -122,6 +125,8 @@ namespace Scenes.GameScene.Bottle
             glassTransform.eulerAngles = new Vector3(0, 0, angleValue);
             shaderController.RotateShaderBack(angleValue);
             InUse = false;
+            SetSortingOrderDown();
+            OnEndPouring?.Invoke();
         }
     
         public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
@@ -169,6 +174,7 @@ namespace Scenes.GameScene.Bottle
 
         public void PouringColorsBetweenBottles(Bottle targetBottle, int countOfColorToTransfer)
         {
+            SetSortingOrderUp();
             var startPouringAngle = rotationValues[shaderController.CalculateStartPouringIndex()] * directionMultiplier;
             var pouringColors = DOTween.Sequence();
             
@@ -177,6 +183,16 @@ namespace Scenes.GameScene.Bottle
                 .InsertCallback(timeMove + 0.01f, () => StartCoroutine(RotateBottleWithPouring(targetBottle, countOfColorToTransfer)))
                 .Insert(timeMove + timeRotation + 0.02f, transform.DOMove(defaultPosition, timeMove))
                 .InsertCallback(timeMove + timeRotation + 0.02f, () => StartCoroutine(RotateBottleBack()));
+        }
+
+        private void SetSortingOrderDown()
+        {
+            sortingGroup.sortingOrder = 0;
+        }
+
+        private void SetSortingOrderUp()
+        {
+            sortingGroup.sortingOrder = 1;
         }
 
         public bool EnableToFillBottle(Color color)

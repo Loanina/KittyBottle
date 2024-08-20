@@ -1,33 +1,21 @@
 using System;
 using System.Collections.Generic;
-using Scenes.GameScene.Bottle;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace Scenes.GameScene
+namespace Scenes.GameScene.Bottle
 {
     public class BottlesContainer : SerializedMonoBehaviour
     {
-        [SerializeField] private Bottle.Bottle bottlePrefab;
+        [SerializeField] private Bottle bottlePrefab;
         [SerializeField] private List<List<Color>> levelColors;
         [SerializeField] private BottlesController bottlesController;
         [SerializeField] private Dictionary<int, List<Vector3>> layoutSettings;
-        private List<Bottle.Bottle> bottles;
+        private List<Bottle> bottles;
         
         private void CreateBottles()
         {
-            /*
             bottles = new List<Bottle>();
-            foreach (var bottleColors in levelColors)
-            {
-                var bottle = Instantiate(bottlePrefab, transform);
-                bottle.Initialize(bottleColors);
-                bottles.Add(bottle);
-                bottle.OnClickEvent += bottlesController.OnClickBottle;
-            }
-            */
-            bottles = new List<Bottle.Bottle>();
             for (var i = 0; i < levelColors.Count; i++)
             {
                 var position = transform.TransformPoint(layoutSettings[levelColors.Count][i]);
@@ -35,6 +23,7 @@ namespace Scenes.GameScene
                 bottle.Initialize(levelColors[i]);
                 bottles.Add(bottle);
                 bottle.OnClickEvent += bottlesController.OnClickBottle;
+                bottle.OnEndPouring += CheckLevelCompletion;
                 bottle.SetDefaultPosition();
             }
         }
@@ -42,10 +31,16 @@ namespace Scenes.GameScene
         private void Start()
         {
             CreateBottles();
-            /*
-            LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
-            bottles.ForEach(bottle => bottle.SetDefaultPosition());
-            */  
+        }
+
+        private void CheckLevelCompletion()
+        {
+            foreach (var bottle in bottles)
+            {
+                var numberOfTopColorLayers = bottle.GetNumberOfTopColorLayers();
+                if (numberOfTopColorLayers !=4 & numberOfTopColorLayers !=0) return;
+            }
+            Debug.Log("LEVEL COMPLETE!!!!!!!");
         }
 
         [Serializable]
