@@ -187,12 +187,12 @@ namespace Scenes.GameScene.Bottle
 
         private void SetSortingOrderDown()
         {
-            sortingGroup.sortingOrder = 0;
+            sortingGroup.sortingOrder = 1;
         }
 
         private void SetSortingOrderUp()
         {
-            sortingGroup.sortingOrder = 1;
+            sortingGroup.sortingOrder = 2;
         }
 
         public bool EnableToFillBottle(Color color)
