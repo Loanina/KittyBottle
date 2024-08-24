@@ -1,8 +1,8 @@
-using System; 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Scenes.GameScene
+namespace Scenes.GameScene.Bottle
 {
     public class BottleShaderController : MonoBehaviour
     {
@@ -63,7 +63,7 @@ namespace Scenes.GameScene
             UpdateTopColorValues();
         }
 
-        public void RotateShader(float angleValue, float lastAngleValue, Bottle.Bottle targetBottle)
+        public void RotateShader(float angleValue, float lastAngleValue, Bottle targetBottle)
         {
             bottleMaskSR.material.SetFloat(ScaleAndRotationMultiplyProperty, scaleAndRotationMultiplierCurve.Evaluate(angleValue));
             

@@ -8,12 +8,12 @@ namespace Scenes.GameScene.Bottle
     public class BottlesContainer : SerializedMonoBehaviour
     {
         [SerializeField] private Bottle bottlePrefab;
-        [SerializeField] private List<List<Color>> levelColors;
+       // [SerializeField] private List<List<Color>> levelColors;
         [SerializeField] private BottlesController bottlesController;
         [SerializeField] private Dictionary<int, List<Vector3>> layoutSettings;
         private List<Bottle> bottles;
-        
-        private void CreateBottles()
+
+        public void CreateBottles(List<List<Color>> levelColors)
         {
             bottles = new List<Bottle>();
             for (var i = 0; i < levelColors.Count; i++)
@@ -26,11 +26,6 @@ namespace Scenes.GameScene.Bottle
                 bottle.OnEndPouring += CheckLevelCompletion;
                 bottle.SetDefaultPosition();
             }
-        }
-
-        private void Start()
-        {
-            CreateBottles();
         }
 
         private void CheckLevelCompletion()

@@ -69,7 +69,6 @@ namespace Scenes.GameScene.Bottle
             firstBottle.InUse = true;
             secondBottle.UsesCount += 1;
             var countOfColorToTransfer = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
-            Debug.Log($"count of colors to transfer {countOfColorToTransfer}");
             secondBottle.AddColor(countOfColorToTransfer, firstBottle.GetTopColor());
             firstBottle.ChooseRotationPointAndDirection(secondBottle.transform.position.x);
             firstBottle.PouringColorsBetweenBottles(secondBottle, countOfColorToTransfer);

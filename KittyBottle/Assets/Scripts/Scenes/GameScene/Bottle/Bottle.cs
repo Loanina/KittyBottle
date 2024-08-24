@@ -159,7 +159,6 @@ namespace Scenes.GameScene.Bottle
         public void GoToStartPosition()
         {
             transform.DOMove(defaultPosition, timeMove);
-            Debug.Log($"go to default position --- {defaultPosition}");
         }
         
         public void FillUp(float fillUpToAdd)
