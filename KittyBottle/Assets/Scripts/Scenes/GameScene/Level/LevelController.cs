@@ -8,19 +8,28 @@ namespace Scenes.GameScene.Level
     public class LevelController : MonoBehaviour
     {
         [SerializeField] private LevelCollection levelCollection;
+        [SerializeField] private BottlesContainer bottlesContainer;
+        [SerializeField] private ColorPalette.ColorPalette colorPalette;
         private LevelData currentLevel;
+        [SerializeField] private int currentLevelIndex = 0;
         
-        public void LoadLevel(int levelIndex, BottlesContainer bottlesContainer, ColorPalette.ColorPalette colorPalette)
+        public void Initialize(ColorPalette.ColorPalette palette)
         {
-            if (levelIndex >= 0 && levelIndex < levelCollection.levels.Count)
+            colorPalette = palette;
+            bottlesContainer.OnLevelComplete += OnLevelComplete;
+        }
+        
+        public void LoadLevel()
+        {
+            if (currentLevelIndex >= 0 && currentLevelIndex < levelCollection.levels.Count)
             {
-                currentLevel = levelCollection.levels[levelIndex];
-                bottlesContainer.CreateBottles(GetLevelColorsFromPalette(colorPalette));
+                currentLevel = levelCollection.levels[currentLevelIndex];
+                bottlesContainer.CreateBottles(GetLevelColorsFromPalette());
             }
             else Debug.Log("Level not find");
         }
 
-        private List<List<Color>> GetLevelColorsFromPalette(ColorPalette.ColorPalette colorPalette)
+        private List<List<Color>> GetLevelColorsFromPalette()
         {
             try
             {
@@ -41,6 +50,13 @@ namespace Scenes.GameScene.Level
                 Debug.Log(e);
                 return null;
             }
+        }
+
+        private void OnLevelComplete()
+        {
+            bottlesContainer.DeleteBottles();
+            currentLevelIndex += 1;
+            LoadLevel();
         }
     }
 }

@@ -14,7 +14,8 @@ namespace Scenes.GameScene
         private void Start()
         {
             colorPaletteController.LoadPalette(0);
-            levelController.LoadLevel(0, bottlesContainer, colorPaletteController.GetColorPalette());
+            levelController.Initialize(colorPaletteController.GetColorPalette());
+            levelController.LoadLevel();
             Debug.Log("Game scene data loaded");
         }
     }

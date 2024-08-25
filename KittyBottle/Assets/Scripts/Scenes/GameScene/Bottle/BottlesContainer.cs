@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -8,17 +9,18 @@ namespace Scenes.GameScene.Bottle
     public class BottlesContainer : SerializedMonoBehaviour
     {
         [SerializeField] private Bottle bottlePrefab;
-       // [SerializeField] private List<List<Color>> levelColors;
         [SerializeField] private BottlesController bottlesController;
-        [SerializeField] private Dictionary<int, List<Vector3>> layoutSettings;
+        [SerializeField] private LayoutSettings layoutSettings;
         private List<Bottle> bottles;
+        public event Action OnLevelComplete;
 
         public void CreateBottles(List<List<Color>> levelColors)
         {
             bottles = new List<Bottle>();
+            var layout = layoutSettings.GetLayout(levelColors.Count);
             for (var i = 0; i < levelColors.Count; i++)
             {
-                var position = transform.TransformPoint(layoutSettings[levelColors.Count][i]);
+                var position = transform.TransformPoint(layout[i]);
                 var bottle = Instantiate(bottlePrefab, position, new Quaternion(), transform);
                 bottle.Initialize(levelColors[i]);
                 bottles.Add(bottle);
@@ -26,6 +28,20 @@ namespace Scenes.GameScene.Bottle
                 bottle.OnEndPouring += CheckLevelCompletion;
                 bottle.SetDefaultPosition();
             }
+        }
+
+        public void DeleteBottles()
+        {
+            if (bottles == null) return;
+            foreach (var bottle in bottles)
+            {
+                DOTween.Kill(bottle.gameObject);
+                bottle.OnClickEvent -= bottlesController.OnClickBottle;
+                bottle.OnEndPouring -= CheckLevelCompletion;
+                Destroy(bottle.gameObject);
+            }
+            bottles.Clear();
+            Debug.Log("Bottles was deleted");
         }
 
         private void CheckLevelCompletion()
@@ -36,13 +52,7 @@ namespace Scenes.GameScene.Bottle
                 if (numberOfTopColorLayers !=4 & numberOfTopColorLayers !=0) return;
             }
             Debug.Log("LEVEL COMPLETE!!!!!!!");
-        }
-
-        [Serializable]
-        private class LayoutParams
-        {
-            public Vector3 position;
-            public Vector3 scale;
+            OnLevelComplete?.Invoke();
         }
     }
 }

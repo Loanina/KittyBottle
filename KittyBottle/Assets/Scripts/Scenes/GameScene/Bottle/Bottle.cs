@@ -124,9 +124,6 @@ namespace Scenes.GameScene.Bottle
             angleValue = 0.0f;
             glassTransform.eulerAngles = new Vector3(0, 0, angleValue);
             shaderController.RotateShaderBack(angleValue);
-            InUse = false;
-            SetSortingOrderDown();
-            OnEndPouring?.Invoke();
         }
     
         public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
@@ -153,12 +150,12 @@ namespace Scenes.GameScene.Bottle
         
         public void GoUp()
         {
-            transform.DOMoveY(defaultPosition.y + 0.20f, timeMove);
+            transform.DOMoveY(defaultPosition.y + 0.20f, timeMove).SetTarget(gameObject);
         }
 
         public void GoToStartPosition()
         {
-            transform.DOMove(defaultPosition, timeMove);
+            transform.DOMove(defaultPosition, timeMove).SetTarget(gameObject);
         }
         
         public void FillUp(float fillUpToAdd)
@@ -171,17 +168,39 @@ namespace Scenes.GameScene.Bottle
             shaderController.AddColor(count, color);
         }
 
+        private int activeCoroutines;
+        private bool sequenceCompleted;
         public void PouringColorsBetweenBottles(Bottle targetBottle, int countOfColorToTransfer)
         {
+            sequenceCompleted = false;
+            activeCoroutines = 0;
             SetSortingOrderUp();
             var startPouringAngle = rotationValues[shaderController.CalculateStartPouringIndex()] * directionMultiplier;
-            var pouringColors = DOTween.Sequence();
+            var pouringColors = DOTween.Sequence().SetTarget(gameObject);
             
             pouringColors.Append(transform.DOMove(targetBottle.transform.position + chosenPouringPoint, timeMove))
-                .InsertCallback(0.0f, () => StartCoroutine(RotateBottleToAngle(startPouringAngle)))
+                .InsertCallback(0.0f, () => StartCoroutine( RotateBottleToAngle(startPouringAngle)))
                 .InsertCallback(timeMove + 0.01f, () => StartCoroutine(RotateBottleWithPouring(targetBottle, countOfColorToTransfer)))
                 .Insert(timeMove + timeRotation + 0.02f, transform.DOMove(defaultPosition, timeMove))
-                .InsertCallback(timeMove + timeRotation + 0.02f, () => StartCoroutine(RotateBottleBack()));
+                .InsertCallback(timeMove + timeRotation + 0.02f, () => StartCoroutine(TrackCoroutine(RotateBottleBack())))
+                .OnComplete(() => { sequenceCompleted = true; CheckCompletion();});
+        }
+
+        private IEnumerator TrackCoroutine(IEnumerator coroutine)
+        {
+            activeCoroutines++;
+            yield return StartCoroutine(coroutine);
+            activeCoroutines--;
+
+            CheckCompletion();
+        }
+
+        private void CheckCompletion()
+        {
+            if (activeCoroutines != 0 || !sequenceCompleted) return;
+            InUse = false;
+            SetSortingOrderDown();
+            OnEndPouring?.Invoke();
         }
 
         private void SetSortingOrderDown()
