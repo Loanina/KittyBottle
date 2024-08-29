@@ -1,6 +1,7 @@
 using Scenes.GameScene.Bottle;
 using Scenes.GameScene.ColorPalette;
 using Scenes.GameScene.Level;
+using Common.DataManagement;
 using UnityEngine;
 
 namespace Scenes.GameScene
@@ -10,6 +11,12 @@ namespace Scenes.GameScene
         [SerializeField] private BottlesContainer bottlesContainer;
         [SerializeField] private LevelController levelController;
         [SerializeField] private ColorPaletteController colorPaletteController;
+
+        [ContextMenu("Clear player data")]
+        private void ClearPlayerData()
+        {
+            SaveSystem.Clear();
+        }
         
         private void Start()
         {

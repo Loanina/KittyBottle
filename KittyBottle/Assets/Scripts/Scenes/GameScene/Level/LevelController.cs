@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Common.DataManagement;
 using Scenes.GameScene.Bottle;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ namespace Scenes.GameScene.Level
         public void Initialize(ColorPalette.ColorPalette palette)
         {
             colorPalette = palette;
+            currentLevelIndex = SaveSystem.LoadPlayerData().lastLevelID + 1;
             bottlesContainer.OnLevelComplete += OnLevelComplete;
         }
         
@@ -54,9 +56,19 @@ namespace Scenes.GameScene.Level
 
         private void OnLevelComplete()
         {
+            SavePlayerData();
             bottlesContainer.DeleteBottles();
             currentLevelIndex += 1;
             LoadLevel();
+        }
+
+        private void SavePlayerData()
+        {
+            var data = SaveSystem.LoadPlayerData();
+            data.coins += 10;
+            data.lastLevelID = currentLevelIndex;
+            SaveSystem.SavePlayerData(data);
+            Debug.Log($"Player data saved: last level ID: {data.lastLevelID}, coins: {data.coins}");
         }
     }
 }
