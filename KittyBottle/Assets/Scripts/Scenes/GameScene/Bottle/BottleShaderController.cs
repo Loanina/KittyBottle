@@ -12,7 +12,7 @@ namespace Scenes.GameScene.Bottle
         [SerializeField] private float[] fillAmountValues;
         [SerializeField] private int maxColorsInBottle = 4;
         
-        private Stack<Color> _bottleColors;
+        public Stack<Color> _bottleColors { get; private set; }
         public Color TopColor { get; private set; }
         public int NumberOfTopColorLayers { get; private set; } = 1;
         private static readonly int ScaleAndRotationMultiplyProperty = Shader.PropertyToID("_ScaleAndRotationMultiplyProperty");

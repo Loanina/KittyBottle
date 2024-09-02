@@ -237,6 +237,11 @@ namespace Scenes.GameScene.Bottle
         {
             return shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
         }
+
+        public Stack<Color> GetColors()
+        {
+            return shaderController._bottleColors;
+        }
         
         public void OnClick()
         {

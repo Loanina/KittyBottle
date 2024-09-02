@@ -10,6 +10,7 @@ namespace Scenes.GameScene.Level
     {
         [SerializeField] private LevelCollection levelCollection;
         [SerializeField] private BottlesContainer bottlesContainer;
+        [SerializeField] private HintManager hintManager;
         [SerializeField] private ColorPalette.ColorPalette colorPalette;
         private LevelData currentLevel;
         [SerializeField] private int currentLevelIndex = 0;
@@ -19,6 +20,8 @@ namespace Scenes.GameScene.Level
             colorPalette = palette;
             currentLevelIndex = SaveSystem.LoadPlayerData().lastLevelID + 1;
             bottlesContainer.OnLevelComplete += OnLevelComplete;
+            hintManager.OnGetBestMoveEvent += bottlesContainer.OnBestMove;
+            hintManager.OnRestartEvent += OnRestartLevel;
         }
         
         public void LoadLevel()
@@ -59,6 +62,12 @@ namespace Scenes.GameScene.Level
             SavePlayerData();
             bottlesContainer.DeleteBottles();
             currentLevelIndex += 1;
+            LoadLevel();
+        }
+
+        private void OnRestartLevel()
+        {
+            bottlesContainer.DeleteBottles();
             LoadLevel();
         }
 
