@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Scenes.GameScene.Bottle
@@ -57,6 +58,16 @@ namespace Scenes.GameScene.Bottle
             bottleMaskSR.material.SetFloat(ScaleAndRotationMultiplyProperty, scaleAndRotationMultiplierCurve.Evaluate(angleValue));
             bottleMaskSR.material.SetFloat(FillAmount,fillAmountCurve.Evaluate(angleValue));
             for (var i = countOfColorToTransfer; i > 0; i--)
+            {
+                _bottleColors.Pop();
+            }
+            UpdateTopColorValues();
+        }
+
+        public void HideTopColor(int count)
+        {
+            bottleMaskSR.material.SetFloat(FillAmount, fillAmountValues[_bottleColors.Count() - count]);
+            for (var i = count; i > 0; i--)
             {
                 _bottleColors.Pop();
             }

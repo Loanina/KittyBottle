@@ -4,9 +4,9 @@ namespace Scenes.GameScene.Bottle
 {
     public class Move
     {
-        private int from;
-        private int to;
-        private int countOfColorToTransfer;
+        public int from { get; private set; }
+        public int to { get; private set; }
+        public int countOfColorToTransfer { get; private set; }
 
         public Move(int from, int to, int countOfColorToTransfer)
         {

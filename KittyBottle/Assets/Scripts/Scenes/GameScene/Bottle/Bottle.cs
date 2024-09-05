@@ -168,6 +168,11 @@ namespace Scenes.GameScene.Bottle
             shaderController.AddColor(count, color);
         }
 
+        public void RemoveTopColor(int count)
+        {
+            shaderController.HideTopColor(count);
+        }
+
         private int activeCoroutines;
         private bool sequenceCompleted;
         public void PouringColorsBetweenBottles(Bottle targetBottle, int countOfColorToTransfer)

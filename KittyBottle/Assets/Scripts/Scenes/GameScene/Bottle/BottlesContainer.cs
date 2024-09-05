@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -132,6 +131,16 @@ namespace Scenes.GameScene.Bottle
             }
 
             return 0; // Низкий приоритет для неэффективных ходов
+        }
+
+        public Bottle GetBottle(int index)
+        {
+            return bottles[index];
+        }
+
+        public int GetIndexOfBottle(Bottle bottle)
+        {
+            return bottles.IndexOf(bottle);
         }
     }
 }

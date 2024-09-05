@@ -5,6 +5,8 @@ namespace Scenes.GameScene.Bottle
 {
     public class BottlesController : MonoBehaviour
     {
+        private BottlesContainer bottlesContainer;
+        private MovesManager movesManager;
         private Bottle firstBottle;
         private Bottle secondBottle;
 
@@ -72,6 +74,16 @@ namespace Scenes.GameScene.Bottle
             secondBottle.AddColor(countOfColorToTransfer, firstBottle.GetTopColor());
             firstBottle.ChooseRotationPointAndDirection(secondBottle.transform.position.x);
             firstBottle.PouringColorsBetweenBottles(secondBottle, countOfColorToTransfer);
+            
+           // movesManager.AddMove(bottlesContainer.GetIndexOfBottle(firstBottle), bottlesContainer.GetIndexOfBottle(secondBottle), countOfColorToTransfer);
+        }
+
+        public void TransferColorWithoutAnimation(int from, int to, int countOfColorToTransfer)
+        {
+            var bottleFrom = bottlesContainer.GetBottle(from);
+            var bottleTo = bottlesContainer.GetBottle(to);
+            bottleFrom.AddColor(countOfColorToTransfer, bottleTo.GetTopColor());
+            bottleTo.RemoveTopColor(countOfColorToTransfer);
         }
     }
 }
