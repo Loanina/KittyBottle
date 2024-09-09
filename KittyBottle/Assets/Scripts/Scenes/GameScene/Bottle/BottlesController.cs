@@ -68,8 +68,8 @@ namespace Scenes.GameScene.Bottle
                 firstBottle.GoToStartPosition();
                 return;
             }
-            firstBottle.InUse = true;
-            secondBottle.UsesCount += 1;
+            //firstBottle.InUse = true;
+            secondBottle.IncreaseUsagesCount();
             var countOfColorToTransfer = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
             secondBottle.AddColor(countOfColorToTransfer, firstBottle.GetTopColor());
             firstBottle.ChooseRotationPointAndDirection(secondBottle.transform.position.x);

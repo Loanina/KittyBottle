@@ -28,7 +28,6 @@ namespace Scenes.GameScene.Bottle
                 bottles.Add(bottle);
                 bottle.OnClickEvent += bottlesController.OnClickBottle;
                 bottle.OnEndPouring += CheckLevelCompletion;
-                bottle.SetDefaultPosition();
             }
         }
 

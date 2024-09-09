@@ -14,25 +14,15 @@ namespace Scenes.GameScene.Bottle
         [SerializeField] private BottleShaderController shaderController;
         [SerializeField] private PouringAnimationController pouringAnimationController;
         [SerializeField] private SortingGroup sortingGroup;
-        [SerializeField] private Transform glassTransform;
-        [SerializeField] private float[] rotationValues = {33.0f, 67.5f, 78.75f, 85.6f, 90.0f};
-        [SerializeField] private AnimationCurve rotationSpeedMultiplier;
         [SerializeField] private Transform rightPouringPoint;
         [SerializeField] private Transform leftPouringPoint;
         [SerializeField] private Transform rightRotationPoint;
         [SerializeField] private Transform leftRotationPoint;
-        [SerializeField] private float timeRotation = 0.7f;
-        [SerializeField] private float timeMove = 0.5f;
-    
-        private int rotationIndex;
-        private float directionMultiplier = 1.0f;
-        private Transform chosenRotationPoint;
+        
         private Vector3 chosenPouringPoint;
         private Vector3 defaultPosition;
-        [HideInInspector]
-        public bool InUse = false;
-        [HideInInspector]
-        public int UsesCount = 0;
+        public bool InUse { get; private set; }
+        public int UsesCount { get; private set; }
         
         public event Action<Bottle> OnClickEvent;
         public event Action OnEndPouring;
@@ -40,122 +30,45 @@ namespace Scenes.GameScene.Bottle
         public void Initialize(List<Color> bottleColors)
         {
             shaderController.Initialize(bottleColors);
+            SetDefaultPosition();
         }
 
-        public void SetDefaultPosition()
+        private void SetDefaultPosition()
         {
             defaultPosition = transform.position;
-            Debug.Log($"def pos in init {defaultPosition}");
-        }
-    
-        private IEnumerator RotateBottleWithPouring(Bottle targetBottle, int countOfColorToTransfer)
-        {
-            rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle(countOfColorToTransfer);
-            var time = 0.0f;
-            float angleValue;
-            var firstAngleValue = glassTransform.transform.eulerAngles.z;
-            if (firstAngleValue > 180)
-            {
-                firstAngleValue -= 360;
-                firstAngleValue = Mathf.Abs(firstAngleValue);
-            }
-            firstAngleValue *= directionMultiplier;
-            var lastAngleValue = firstAngleValue;
-            pouringAnimationController.DoColorFlow(directionMultiplier > 0.0f, GetTopColor());
-            
-            while (time < timeRotation)
-            {
-                var lerpValue = time / timeRotation;
-                angleValue = Mathf.Lerp(firstAngleValue,directionMultiplier * rotationValues[rotationIndex], lerpValue);
-                glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
-                shaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
-                
-                //time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
-                time += Time.deltaTime;
-                
-                lastAngleValue = angleValue;
-                yield return new WaitForEndOfFrame();
-            }
-            pouringAnimationController.RemoveFlow(directionMultiplier > 0.0f);
-            angleValue = directionMultiplier * rotationValues[rotationIndex];
-            shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
-            targetBottle.UsesCount -= 1;
-        }
-
-        private IEnumerator RotateBottleToAngle(float finishAngle)
-        {
-            float time = 0;
-            float angleValue;
-            float lastAngleValue = 0;
-            while (time < timeMove)
-            {
-                var lerpValue = time / timeMove;
-                angleValue = Mathf.Lerp(0.0f,finishAngle, lerpValue);
-                glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
-                shaderController.RotateShader(angleValue);
-                
-                time += Time.deltaTime;
-                lastAngleValue = angleValue;
-                yield return new WaitForEndOfFrame();
-            }
-        }
-    
-        private IEnumerator RotateBottleBack()
-        {
-            float time = 0;
-            float angleValue;
-            var firstAngleValue = glassTransform.transform.eulerAngles.z;
-            if (firstAngleValue > 180) firstAngleValue -= 360;
-            firstAngleValue = Mathf.Abs(firstAngleValue);
-            firstAngleValue *= directionMultiplier;
-            var lastAngleValue = firstAngleValue;
-            
-            while (time < timeMove)
-            {
-                var lerpValue = time / timeMove;
-                angleValue = Mathf.Lerp(firstAngleValue, 0.0f, lerpValue);
-                glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
-                shaderController.RotateShaderBack(angleValue);
-                
-                lastAngleValue = angleValue;
-                time += Time.deltaTime;
-                yield return new WaitForEndOfFrame();
-            }
-            angleValue = 0.0f;
-            glassTransform.eulerAngles = new Vector3(0, 0, angleValue);
-            shaderController.RotateShaderBack(angleValue);
+            Debug.Log($"def position in init {defaultPosition}");
         }
     
         public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
         {
             if (transform.position.x > positionOfTargetBottleX && transform.localPosition.x <= 0.31) 
             {
-                chosenRotationPoint = leftRotationPoint;
+                pouringAnimationController.SetRotationPoint(leftRotationPoint);
                 chosenPouringPoint = rightPouringPoint.localPosition;
-                directionMultiplier = -1.0f;
+                pouringAnimationController.SetDirectionMultiplier(-1.0f);
             }
             else if (transform.localPosition.x >= -0.31)
             {
-                chosenRotationPoint = rightRotationPoint;
+                pouringAnimationController.SetRotationPoint(rightRotationPoint);
                 chosenPouringPoint = leftPouringPoint.localPosition;
-                directionMultiplier = 1.0f;
+                pouringAnimationController.SetDirectionMultiplier(1.0f);
             }
             else
             {
-                chosenRotationPoint = leftRotationPoint;
+                pouringAnimationController.SetRotationPoint(leftRotationPoint);
                 chosenPouringPoint = rightPouringPoint.localPosition;
-                directionMultiplier = -1.0f;
+                pouringAnimationController.SetDirectionMultiplier(-1.0f);
             }
         }
         
         public void GoUp()
         {
-            transform.DOMoveY(defaultPosition.y + 0.20f, timeMove).SetTarget(gameObject);
+            transform.DOMoveY(defaultPosition.y + 0.20f, pouringAnimationController.GetMoveTime()).SetTarget(gameObject);
         }
 
         public void GoToStartPosition()
         {
-            transform.DOMove(defaultPosition, timeMove).SetTarget(gameObject);
+            transform.DOMove(defaultPosition, pouringAnimationController.GetMoveTime()).SetTarget(gameObject);
         }
         
         public void FillUp(float fillUpToAdd)
@@ -177,17 +90,23 @@ namespace Scenes.GameScene.Bottle
         private bool sequenceCompleted;
         public void PouringColorsBetweenBottles(Bottle targetBottle, int countOfColorToTransfer)
         {
+            InUse = true;
             sequenceCompleted = false;
             activeCoroutines = 0;
             SetSortingOrderUp();
-            var startPouringAngle = rotationValues[shaderController.CalculateStartPouringIndex()] * directionMultiplier;
+            var timeMove = pouringAnimationController.GetMoveTime();
+            var timeRotation = pouringAnimationController.GetRotationTime();
             var pouringColors = DOTween.Sequence().SetTarget(gameObject);
             
             pouringColors.Append(transform.DOMove(targetBottle.transform.position + chosenPouringPoint, timeMove))
-                .InsertCallback(0.0f, () => StartCoroutine( RotateBottleToAngle(startPouringAngle)))
-                .InsertCallback(timeMove + 0.01f, () => StartCoroutine(RotateBottleWithPouring(targetBottle, countOfColorToTransfer)))
+                .InsertCallback(0.0f,
+                    () => StartCoroutine(pouringAnimationController.RotateBottleBeforePouring(shaderController)))
+                .InsertCallback(timeMove + 0.01f,
+                    () => StartCoroutine(pouringAnimationController.RotateBottleWithPouring(targetBottle, 
+                        GetTopColor(), countOfColorToTransfer, shaderController)))
                 .Insert(timeMove + timeRotation + 0.02f, transform.DOMove(defaultPosition, timeMove))
-                .InsertCallback(timeMove + timeRotation + 0.02f, () => StartCoroutine(TrackCoroutine(RotateBottleBack())))
+                .InsertCallback(timeMove + timeRotation + 0.02f,
+                    () => StartCoroutine(TrackCoroutine(pouringAnimationController.RotateBottleBack(shaderController))))
                 .OnComplete(() => { sequenceCompleted = true; CheckCompletion();});
         }
 
@@ -246,6 +165,16 @@ namespace Scenes.GameScene.Bottle
         public Stack<Color> GetColors()
         {
             return shaderController._bottleColors;
+        }
+
+        public void IncreaseUsagesCount()
+        {
+            UsesCount += 1;
+        }
+
+        public void DecreaseUsagesCount()
+        {
+            if (UsesCount > 0) UsesCount -= 1;
         }
         
         public void OnClick()
