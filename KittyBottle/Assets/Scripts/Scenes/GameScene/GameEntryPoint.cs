@@ -11,17 +11,18 @@ namespace Scenes.GameScene
         [SerializeField] private BottlesContainer bottlesContainer;
         [SerializeField] private LevelController levelController;
         [SerializeField] private ColorPaletteController colorPaletteController;
+        [SerializeField] private HintManager hintManager;
 
         [ContextMenu("Clear player data")]
         private void ClearPlayerData()
         {
-            SaveSystem.Clear();
+            SaveSystem<PlayerData>.Instance.Clear();
         }
         
         private void Start()
         {
             colorPaletteController.LoadPalette(0);
-            levelController.Initialize(colorPaletteController.GetColorPalette());
+            levelController.Initialize(colorPaletteController.GetColorPalette(), hintManager);
             levelController.LoadLevel();
             Debug.Log("Game scene data loaded");
         }

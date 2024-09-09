@@ -75,7 +75,7 @@ namespace Scenes.GameScene.Bottle
             firstBottle.ChooseRotationPointAndDirection(secondBottle.transform.position.x);
             firstBottle.PouringColorsBetweenBottles(secondBottle, countOfColorToTransfer);
             
-           // movesManager.AddMove(bottlesContainer.GetIndexOfBottle(firstBottle), bottlesContainer.GetIndexOfBottle(secondBottle), countOfColorToTransfer);
+       //     movesManager.AddMove(bottlesContainer.GetIndexOfBottle(firstBottle), bottlesContainer.GetIndexOfBottle(secondBottle), countOfColorToTransfer);
         }
 
         public void TransferColorWithoutAnimation(int from, int to, int countOfColorToTransfer)

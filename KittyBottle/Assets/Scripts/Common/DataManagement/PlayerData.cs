@@ -12,10 +12,6 @@ namespace Common.DataManagement
             this.coins = coins;
         }
 
-        public PlayerData()
-        {
-            lastLevelID = 0;
-            coins = 0;
-        }
+        public PlayerData() : this(0, 0) {}
     }
 }

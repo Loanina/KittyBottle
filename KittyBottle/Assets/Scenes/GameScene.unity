@@ -416,7 +416,7 @@ Transform:
   - {fileID: 1102982303}
   - {fileID: 1722895446}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1044543056
 GameObject:
@@ -452,6 +452,7 @@ MonoBehaviour:
   bottlesContainer: {fileID: 1644246529}
   levelController: {fileID: 1044543059}
   colorPaletteController: {fileID: 1044543060}
+  hintManager: {fileID: 1151690156}
 --- !u!4 &1044543058
 Transform:
   m_ObjectHideFlags: 0
@@ -481,7 +482,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelCollection: {fileID: 11400000, guid: 3f382e9b0a2b3c3459576aa80c64b5a2, type: 2}
   bottlesContainer: {fileID: 1644246529}
-  hintManager: {fileID: 1151690156}
   colorPalette:
     colors: []
   currentLevelIndex: 0
@@ -691,7 +691,7 @@ RectTransform:
   m_Children:
   - {fileID: 1151690155}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1535,7 +1535,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1990851861
 GameObject:

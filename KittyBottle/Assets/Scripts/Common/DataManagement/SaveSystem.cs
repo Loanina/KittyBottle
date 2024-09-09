@@ -1,43 +1,57 @@
 using System;
 using UnityEngine;
 using System.IO;
-using Unity.Properties;
 
 namespace Common.DataManagement
 {
-    public class SaveSystem : MonoBehaviour
+    public class SaveSystem<T> where T : new()
     {
+        private static readonly Lazy<SaveSystem<T>> _instance = new(() => new SaveSystem<T>());
         private static readonly string filePath = Application.persistentDataPath + "/playerdata.dat";
 
-        public static void SavePlayerData(PlayerData data)
+        public static SaveSystem<T> Instance => _instance.Value;
+        
+        public void Save(T data)
         {
-            string json = JsonUtility.ToJson(data);
-            string encryptedJson = EncryptionUtility.Encrypt(json);
-            File.WriteAllText(filePath, encryptedJson);
+            try
+            {
+                var json = JsonUtility.ToJson(data);
+                var encryptedJson = EncryptionUtility.Encrypt(json);
+                File.WriteAllText(filePath, encryptedJson);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error saving data: {ex.Message}");
+            }
         }
 
-        public static PlayerData LoadPlayerData()
+        public T Load()
         {
-            if (File.Exists(filePath))
+            try
             {
-                string encryptedJson = File.ReadAllText(filePath);
-                string decryptedJson = EncryptionUtility.Decrypt(encryptedJson);
-                return JsonUtility.FromJson<PlayerData>(decryptedJson);
+                if (File.Exists(filePath))
+                {
+                    var encryptedJson = File.ReadAllText(filePath);
+                    var decryptedJson = EncryptionUtility.Decrypt(encryptedJson);
+                    return JsonUtility.FromJson<T>(decryptedJson);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                string json = JsonUtility.ToJson(new PlayerData());
-                string encryptedJson = EncryptionUtility.Encrypt(json);
-                File.WriteAllText(filePath, encryptedJson);
-                return new PlayerData();
+                Debug.LogError($"Error loading data: {ex.Message}");
+                SetInitialData();
             }
+            return default;
         }
-         
-        public static void Clear()
+
+        private void SetInitialData()
         {
-            var json = JsonUtility.ToJson(new PlayerData());
-            string encryptedJson = EncryptionUtility.Encrypt(json);
-            File.WriteAllText(filePath, encryptedJson);
+            Save(new T());
+        }
+
+        public void Clear()
+        { 
+            SetInitialData();
         }
     }
 }
