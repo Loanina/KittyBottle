@@ -14,7 +14,6 @@ namespace Scenes.GameScene.Bottle
         [SerializeField] private AnimationCurve rotationSpeedMultiplier;
         private Transform chosenRotationPoint;
         private float directionMultiplier = 1.0f;
-        private int rotationIndex; //
 
         public void SetRotationPoint(Transform point)
         {
@@ -57,7 +56,7 @@ namespace Scenes.GameScene.Bottle
         
         public IEnumerator RotateBottleWithPouring(Bottle targetBottle, Color colorToTransfer, int countOfColorToTransfer, BottleShaderController shaderController)
         {
-            rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle(countOfColorToTransfer);
+            var rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle(countOfColorToTransfer);
             var time = 0.0f;
             float angleValue;
             var firstAngleValue = glassTransform.transform.eulerAngles.z;
