@@ -1,4 +1,4 @@
-namespace Scenes.GameScene.RaycastSystem
+namespace Core.InputSystem
 {
     public interface IClickable
     {
