@@ -1,12 +1,14 @@
+﻿using Common.DataManagement;
+using Scenes.GameScene;
 using Scenes.GameScene.Bottle;
 using Scenes.GameScene.ColorPalette;
 using Scenes.GameScene.Level;
-using Common.DataManagement;
 using UnityEngine;
+using Zenject;
 
-namespace Scenes.GameScene
+namespace Core.Installers
 {
-    public class GameEntryPoint : MonoBehaviour
+    public class GameSceneInstaller : MonoInstaller
     {
         [SerializeField] private BottlesContainer bottlesContainer;
         [SerializeField] private LevelController levelController;
@@ -18,8 +20,8 @@ namespace Scenes.GameScene
         {
             SaveSystem<PlayerData>.Instance.Clear();
         }
-        
-        private void Start()
+
+        public override void InstallBindings()
         {
             colorPaletteController.LoadPalette(0);
             levelController.Initialize(colorPaletteController.GetColorPalette(), hintManager);
