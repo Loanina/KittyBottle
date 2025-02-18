@@ -1,12 +1,20 @@
 using System.Collections.Generic;
+using Scenes.GameScene.Bottle;
 using UnityEngine;
+using Zenject;
 
-namespace Scenes.GameScene.Bottle
+namespace Scenes.GameScene
 {
-    public class MovesManager : MonoBehaviour
+    public class MovesManager
     {
-        private BottlesController bottlesController;
+        private readonly BottlesController bottlesController;
         private Stack<Move> moves;
+
+        [Inject]
+        public MovesManager(BottlesController bottlesController)
+        {
+            this.bottlesController = bottlesController;
+        }
 
         public void AddMove(int from, int to, int countOfColorToTransfer)
         {

@@ -878,7 +878,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1644246528}
-  - component: {fileID: 1644246530}
   - component: {fileID: 1644246529}
   m_Layer: 0
   m_Name: Map
@@ -914,30 +913,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebc905990eae6d0409fd7c70df9e65f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes: []
   bottlePrefab: {fileID: 8723869106329755495, guid: fe01226f1a5ba3d4caf85f10c062d27a, type: 3}
-  bottlesController: {fileID: 1644246530}
   layoutSettings: {fileID: 11400000, guid: 5ae3d3cc3222db74795fb6c5e611bc0d, type: 2}
---- !u!114 &1644246530
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1644246527}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7ce42e8545cf5419f79c1d711ede45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1659966128
 GameObject:
   m_ObjectHideFlags: 0
@@ -1493,12 +1470,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 698ed1f55eb4457aa87ad83b35cbf234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  palletIndex: 0
+  coinsPerLevel: 10
   bottlesContainer: {fileID: 1644246529}
   hintManager: {fileID: 1151690156}
   paletteCollection: {fileID: 11400000, guid: 6d5e1919c12b539438b9744499b9aa4d, type: 2}
-  palletIndex: 0
   levelCollection: {fileID: 11400000, guid: 3f382e9b0a2b3c3459576aa80c64b5a2, type: 2}
-  coinsPerLevel: 10
 --- !u!1 &1990851861
 GameObject:
   m_ObjectHideFlags: 0

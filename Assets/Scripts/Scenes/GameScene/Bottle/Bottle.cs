@@ -25,7 +25,7 @@ namespace Scenes.GameScene.Bottle
         public int UsesCount { get; private set; }
         
         public event Action<Bottle> OnClickEvent;
-        public event Action OnEndPouring;
+        public event Action OnPouringEnd;
 
         public void Initialize(List<Color> bottleColors)
         {
@@ -88,12 +88,19 @@ namespace Scenes.GameScene.Bottle
 
         private int activeCoroutines;
         private bool sequenceCompleted;
-        public void PouringColorsBetweenBottles(Bottle targetBottle, int countOfColorToTransfer)
+        
+        public void PouringColorsBetweenBottles(Bottle targetBottle, Action onComplete = null)
         {
+            var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(GetNumberOfTopColorLayers());
+            targetBottle.AddColor(countOfColorToTransfer, GetTopColor());
+            
+            targetBottle.IncreaseUsagesCount();
+            ChooseRotationPointAndDirection(targetBottle.transform.position.x);
             InUse = true;
             sequenceCompleted = false;
             activeCoroutines = 0;
             SetSortingOrderUp();
+            
             var timeMove = pouringAnimationController.GetMoveTime();
             var timeRotation = pouringAnimationController.GetRotationTime();
             var pouringColors = DOTween.Sequence().SetTarget(gameObject);
@@ -107,7 +114,12 @@ namespace Scenes.GameScene.Bottle
                 .Insert(timeMove + timeRotation + 0.02f, transform.DOMove(defaultPosition, timeMove))
                 .InsertCallback(timeMove + timeRotation + 0.02f,
                     () => StartCoroutine(TrackCoroutine(pouringAnimationController.RotateBottleBack(shaderController))))
-                .OnComplete(() => { sequenceCompleted = true; CheckCompletion();});
+                .OnComplete(() => 
+                { 
+                    sequenceCompleted = true; 
+                    CheckCompletion();
+                    onComplete?.Invoke();
+                });
         }
 
         private IEnumerator TrackCoroutine(IEnumerator coroutine)
@@ -115,7 +127,6 @@ namespace Scenes.GameScene.Bottle
             activeCoroutines++;
             yield return StartCoroutine(coroutine);
             activeCoroutines--;
-
             CheckCompletion();
         }
 
@@ -124,7 +135,7 @@ namespace Scenes.GameScene.Bottle
             if (activeCoroutines != 0 || !sequenceCompleted) return;
             InUse = false;
             SetSortingOrderDown();
-            OnEndPouring?.Invoke();
+            OnPouringEnd?.Invoke();
         }
 
         private void SetSortingOrderDown()
@@ -147,7 +158,7 @@ namespace Scenes.GameScene.Bottle
             return shaderController.TopColor;
         }
 
-        public bool IsBottleEmpty()
+        public bool IsEmpty()
         {
             return shaderController.IsBottleEmpty();
         }

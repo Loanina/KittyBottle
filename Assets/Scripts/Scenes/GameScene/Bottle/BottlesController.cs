@@ -1,41 +1,51 @@
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Scenes.GameScene.Bottle
 {
-    public class BottlesController : MonoBehaviour
+    public class BottlesController
     {
-        private BottlesContainer bottlesContainer;
-        private MovesManager movesManager;
+        private readonly BottlesContainer bottlesContainer;
+        private readonly MovesManager movesManager;
         private Bottle firstBottle;
         private Bottle secondBottle;
+        
+        [Inject]
+        public BottlesController(BottlesContainer container, MovesManager movesManager)
+        {
+            bottlesContainer = container;
+            this.movesManager = movesManager;
+        }
 
-        public void OnClickBottle(Bottle bottle)
+        public void PeekBottle(Bottle bottle)
         {
             try
             {
                 if (bottle == null) return;
+
                 if (firstBottle == null)
                 {
                     if (bottle.InUse || bottle.UsesCount > 0) return;
                     firstBottle = bottle;
                     firstBottle.GoUp();
-                    Debug.Log("first bottle selected");
+                    Debug.Log("First bottle selected");
                 }
                 else if (firstBottle == bottle)
                 {
                     firstBottle.GoToStartPosition();
                     ClearSelection();
-                    Debug.Log("selected bottle equals");
+                    Debug.Log("Deselected the same bottle");
                 }
                 else
                 {
                     if (bottle.InUse)
                     {
-                        Debug.Log("BOTTlE IN USE ohhhhh ssshhhhiiiiiitttt");
+                        Debug.Log("Target bottle is in use");
                         return;
                     }
-                    Debug.Log("2 bottles selected");
+
+                    Debug.Log("Second bottle selected");
                     secondBottle = bottle;
                     TransferColor();
                     ClearSelection();
@@ -43,41 +53,49 @@ namespace Scenes.GameScene.Bottle
             }
             catch (Exception e)
             {
-                Debug.Log(e);
+                Debug.LogError($"Error handling bottle click: {e}");
                 throw;
             }
         }
+
 
         private void ClearSelection()
         {
             firstBottle = null;
             secondBottle = null;
         }
-
-        private bool EnableToTransferColor()
+        
+        private bool CanTransferColor()
         {
-            Debug.Log(
-                $"is empty {firstBottle.IsBottleEmpty()} enable to fill second bottle {secondBottle.EnableToFillBottle(firstBottle.GetTopColor())}");
-            return !firstBottle.IsBottleEmpty() && secondBottle.EnableToFillBottle(firstBottle.GetTopColor());
+            var isFirstBottleEmpty = firstBottle.IsEmpty();
+            var canFillSecondBottle = secondBottle.EnableToFillBottle(firstBottle.GetTopColor());
+            
+            Debug.Log($"First bottle empty: {isFirstBottleEmpty}, Can fill second: {canFillSecondBottle}");
+            return !isFirstBottleEmpty && canFillSecondBottle;
         }
-
+        
         private void TransferColor()
         {
-            if (!EnableToTransferColor())
+            if (!CanTransferColor())
             {
                 firstBottle.GoToStartPosition();
                 return;
             }
-            //firstBottle.InUse = true;
-            secondBottle.IncreaseUsagesCount();
-            var countOfColorToTransfer = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
-            secondBottle.AddColor(countOfColorToTransfer, firstBottle.GetTopColor());
-            firstBottle.ChooseRotationPointAndDirection(secondBottle.transform.position.x);
-            firstBottle.PouringColorsBetweenBottles(secondBottle, countOfColorToTransfer);
-            
-       //     movesManager.AddMove(bottlesContainer.GetIndexOfBottle(firstBottle), bottlesContainer.GetIndexOfBottle(secondBottle), countOfColorToTransfer);
-        }
 
+            var transferAmount = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
+            secondBottle.IncreaseUsagesCount();
+            
+            firstBottle.PouringColorsBetweenBottles(secondBottle, () => 
+            {
+                movesManager.AddMove(
+                    bottlesContainer.GetIndexOfBottle(firstBottle),
+                    bottlesContainer.GetIndexOfBottle(secondBottle),
+                    transferAmount
+                );
+                ClearSelection();
+            });
+        }
+        
         public void TransferColorWithoutAnimation(int from, int to, int countOfColorToTransfer)
         {
             var bottleFrom = bottlesContainer.GetBottle(from);

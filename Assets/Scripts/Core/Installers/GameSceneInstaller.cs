@@ -1,23 +1,25 @@
 ﻿using Common.DataManagement;
+using Core.Hints;
 using Core.SavingSystem;
 using Scenes.GameScene;
 using Scenes.GameScene.Bottle;
 using Scenes.GameScene.ColorPalette;
 using Scenes.GameScene.Level;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 namespace Core.Installers
 {
     public class GameSceneInstaller : MonoInstaller
     {
-        [SerializeField] private BottlesContainer bottlesContainer;
+        [SerializeField, Range(0, 1)] private int palletIndex;
+        [SerializeField] private int coinsPerLevel = 10;
         [SerializeField] private HintManager hintManager;
         [SerializeField] private ColorPaletteCollection paletteCollection;
-        [SerializeField, Range(0, 1)] private int palletIndex;
         [SerializeField] private LevelCollection levelCollection;
-        [SerializeField] private int coinsPerLevel = 10;
+        [SerializeField] private Bottle bottlePrefab;
+        [SerializeField] private LayoutSettings layoutSettings;
+        [SerializeField] private Transform bottlesParentTransform;
 
         [ContextMenu("Clear player data")]
         private void ClearPlayerData()
@@ -34,7 +36,19 @@ namespace Core.Installers
             Container.Bind<ISaveSystem<PlayerData>>()
                 .To<SaveSystemAdapter<PlayerData>>()
                 .AsSingle();
-            Container.BindInterfacesAndSelfTo<LevelController>().AsSingle().WithArguments(bottlesContainer, hintManager);
+            Container.BindInterfacesAndSelfTo<LevelController>().AsSingle().WithArguments(hintManager);
+            Container.Bind<IMoveStrategy>()
+                .To<BfsMoveStrategy>()
+                .AsSingle();
+            Container.Bind<BottlesController>().AsSingle();
+            Container.Bind<MovesManager>().AsSingle();
+            Container.Bind<BottlesContainer>().AsSingle().WithArguments(layoutSettings, bottlesParentTransform);
+            
+            Container.Bind<IBottleFactory>()
+                .To<UnityBottleFactory>()
+                .AsSingle()
+                .WithArguments(bottlePrefab);
+
             Debug.Log("Game scene data loaded");
         }
     }
