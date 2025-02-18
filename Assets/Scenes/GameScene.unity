@@ -1427,8 +1427,6 @@ GameObject:
   - component: {fileID: 1908015870}
   - component: {fileID: 1908015869}
   - component: {fileID: 1908015873}
-  - component: {fileID: 1908015872}
-  - component: {fileID: 1908015871}
   m_Layer: 0
   m_Name: SceneContext
   m_TagString: Untagged
@@ -1483,49 +1481,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 365812104}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1908015871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1908015868}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63af5cc0031470b45af35eddec922587, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  paletteCollection: {fileID: 11400000, guid: 6d5e1919c12b539438b9744499b9aa4d, type: 2}
-  currentColorPalette:
-    colors:
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
-    - {r: 0.40843275, g: 0.8396226, b: 0.21703447, a: 1}
---- !u!114 &1908015872
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1908015868}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f84f54ad605d95b4e930cab7bf1c5695, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelCollection: {fileID: 11400000, guid: 3f382e9b0a2b3c3459576aa80c64b5a2, type: 2}
-  bottlesContainer: {fileID: 1644246529}
-  colorPalette:
-    colors: []
-  currentLevelIndex: 0
 --- !u!114 &1908015873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1539,9 +1494,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bottlesContainer: {fileID: 1644246529}
-  levelController: {fileID: 1908015872}
-  colorPaletteController: {fileID: 1908015871}
   hintManager: {fileID: 1151690156}
+  paletteCollection: {fileID: 11400000, guid: 6d5e1919c12b539438b9744499b9aa4d, type: 2}
+  palletIndex: 0
+  levelCollection: {fileID: 11400000, guid: 3f382e9b0a2b3c3459576aa80c64b5a2, type: 2}
+  coinsPerLevel: 10
 --- !u!1 &1990851861
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,82 +1,82 @@
 using System;
-using System.Collections.Generic;
-using Common.DataManagement;
+using Core.SavingSystem;
+using Scenes.GameScene;
 using Scenes.GameScene.Bottle;
-using UnityEngine;
+using Scenes.GameScene.Level;
+using Zenject;
 
-namespace Scenes.GameScene.Level
+public class LevelController : IInitializable, IDisposable
 {
-    public class LevelController : MonoBehaviour
+    private int currentLevelIndex;
+    
+    private readonly LevelProvider levelProvider;
+    private readonly BottlesContainer bottlesContainer;
+    private readonly LevelColorMapper colorMapper;
+    private readonly PlayerProgressService progressService;
+    private readonly HintManager hintManager;
+
+    [Inject]
+    public LevelController(
+        LevelProvider levelProvider,
+        BottlesContainer bottlesContainer,
+        LevelColorMapper colorMapper,
+        PlayerProgressService progressService,
+        HintManager hintManager)
     {
-        [SerializeField] private LevelCollection levelCollection;
-        [SerializeField] private BottlesContainer bottlesContainer;
-        [SerializeField] private ColorPalette.ColorPalette colorPalette;
-        [SerializeField] private int currentLevelIndex = 0;
-        private LevelData currentLevel;
-        
-        public void Initialize(ColorPalette.ColorPalette palette, HintManager hintManager)
+        this.levelProvider = levelProvider;
+        this.bottlesContainer = bottlesContainer;
+        this.colorMapper = colorMapper;
+        this.progressService = progressService;
+        this.hintManager = hintManager;
+    }
+
+    public void Initialize()
+    {
+        currentLevelIndex = LoadProgress();
+        SubscribeToEvents();
+        LoadLevel();
+    }
+
+    private int LoadProgress() => 
+        progressService.GetLastCompletedLevel() + 1;
+
+    private void SubscribeToEvents()
+    {
+        bottlesContainer.OnLevelComplete += OnLevelComplete;
+        hintManager.OnBestMoveRequested += bottlesContainer.CalculateBestMove;
+        hintManager.OnRestartRequested += OnRestartLevel;
+    }
+
+    private void LoadLevel()
+    {
+        if (!levelProvider.HasLevel(currentLevelIndex))
         {
-            colorPalette = palette;
-            currentLevelIndex = SaveSystem<PlayerData>.Instance.Load().lastLevelID + 1;
-            bottlesContainer.OnLevelComplete += OnLevelComplete;
-            hintManager.OnGetBestMoveEvent += bottlesContainer.OnBestMove;
-            hintManager.OnRestartEvent += OnRestartLevel;
-        }
-        
-        public void LoadLevel()
-        {
-            if (currentLevelIndex >= 0 && currentLevelIndex < levelCollection.levels.Count)
-            {
-                currentLevel = levelCollection.levels[currentLevelIndex];
-                bottlesContainer.CreateBottles(GetLevelColorsFromPalette());
-            }
-            else Debug.Log("Level not find");
+            throw new ArgumentOutOfRangeException(nameof(currentLevelIndex));
         }
 
-        private List<List<Color>> GetLevelColorsFromPalette()
-        {
-            try
-            {
-                var levelColors = new List<List<Color>>();
-                foreach (var bottle in currentLevel.level)
-                {
-                    var newBottle = new List<Color>();
-                    foreach (var colorIndex in bottle)
-                    {
-                        newBottle.Add(colorPalette.GetColor(colorIndex));
-                    }
-                    levelColors.Add(newBottle);
-                }
-                return levelColors;
-            }
-            catch(Exception e)
-            {
-                Debug.Log(e);
-                return null;
-            }
-        }
+        var levelData = levelProvider.GetLevel(currentLevelIndex);
+        var colors = colorMapper.MapLevelDataToColors(levelData);
+        bottlesContainer.CreateBottles(colors);
+    }
 
-        private void OnLevelComplete()
-        {
-            SavePlayerData();
-            bottlesContainer.DeleteBottles();
-            currentLevelIndex += 1;
-            LoadLevel();
-        }
+    private void OnLevelComplete()
+    {
+        progressService.UpdateProgress(currentLevelIndex);
+        bottlesContainer.DeleteBottles();
+        currentLevelIndex++;
+        LoadLevel();
+    }
 
-        private void OnRestartLevel()
-        {
-            bottlesContainer.DeleteBottles();
-            LoadLevel();
-        }
+    private void OnRestartLevel()
+    {
+        bottlesContainer.DeleteBottles();
+        LoadLevel();
+    }
 
-        private void SavePlayerData()
-        {
-            var data = SaveSystem<PlayerData>.Instance.Load();
-            data.coins += 10;
-            data.lastLevelID = currentLevelIndex;
-            SaveSystem<PlayerData>.Instance.Save(data);
-            Debug.Log($"Player data saved: last level ID: {data.lastLevelID}, coins: {data.coins}");
-        }
+    public void Dispose()
+    {
+        bottlesContainer.OnLevelComplete -= OnLevelComplete;
+        hintManager.OnBestMoveRequested -= bottlesContainer.CalculateBestMove;
+        hintManager.OnRestartRequested -= OnRestartLevel;
     }
 }

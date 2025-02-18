@@ -1,24 +1,38 @@
+using System;
 using UnityEngine;
+using Zenject;
 
 namespace Scenes.GameScene.ColorPalette
 {
-    public class ColorPaletteController : MonoBehaviour
+    public class ColorPaletteController : IInitializable
     {
-        [SerializeField] private ColorPaletteCollection paletteCollection;
-        public ColorPalette currentColorPalette;
+        private readonly ColorPaletteCollection colorPaletteCollection;
+        private readonly int selectedPaletteIndex;
+        private ColorPalette currentColorPalette;
 
-        public void LoadPalette(int paletteIndex)
+        [Inject]
+        public ColorPaletteController(ColorPaletteCollection colorPaletteCollection, int paletteIndex)
         {
-            if (paletteIndex >= 0 && paletteIndex < paletteCollection.colorPalettes.Count)
+            this.colorPaletteCollection = colorPaletteCollection;
+            selectedPaletteIndex = paletteIndex;
+        }
+
+        public void Initialize()
+        {
+            SelectPalette(selectedPaletteIndex);
+        }
+
+        private void SelectPalette(int paletteIndex)
+        {
+            if (paletteIndex < 0 || paletteIndex >= colorPaletteCollection.colorPalettes.Count)
             {
-                currentColorPalette = paletteCollection.colorPalettes[paletteIndex];
+                throw new ArgumentOutOfRangeException(nameof(paletteIndex), "Invalid palette index");
             }
-            else Debug.Log("Color palette not found");
+            currentColorPalette = colorPaletteCollection.colorPalettes[paletteIndex];
         }
 
-        public ColorPalette GetColorPalette()
-        {
-            return currentColorPalette;
-        }
+        public ColorPalette GetCurrentColorPalette() => currentColorPalette;
+        
+        public Color GetColorByIndex(int index) => currentColorPalette.GetColor(index);
     }
 }

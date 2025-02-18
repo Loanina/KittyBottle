@@ -5,23 +5,23 @@ namespace Scenes.GameScene
 {
     public class HintManager : MonoBehaviour
     {
-        public event Action OnRestartEvent;
-        public event Action OnGetBestMoveEvent;
-        public event Action OnReturnMoveEvent; 
+        public event Action OnRestartRequested;
+        public event Action OnBestMoveRequested;
+        public event Action OnReturnRequested; 
 
         public void OnRestartLevel()
         {
-            OnRestartEvent?.Invoke();
+            OnRestartRequested?.Invoke();
         }
 
         public void OnGetBestMove()
         {
-            OnGetBestMoveEvent?.Invoke();
+            OnBestMoveRequested?.Invoke();
         }
 
         public void OnReturnMove()
         {
-            OnReturnMoveEvent?.Invoke();
+            OnReturnRequested?.Invoke();
         }
         
         

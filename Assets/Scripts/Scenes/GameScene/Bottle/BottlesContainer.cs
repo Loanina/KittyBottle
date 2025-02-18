@@ -52,13 +52,12 @@ namespace Scenes.GameScene.Bottle
                 var numberOfTopColorLayers = bottle.GetNumberOfTopColorLayers();
                 if (numberOfTopColorLayers !=4 & numberOfTopColorLayers !=0) return;
             }
-            Debug.Log("LEVEL COMPLETE!!!!!!!");
+            Debug.Log("LEVEL COMPLETE!");
             OnLevelComplete?.Invoke();
         }
 
-        public void OnBestMove()
+        public void CalculateBestMove()
         {
-            Debug.Log("LETS GOOOOOOOOOOOOOOOOO!");
             var bestMove = GetBestMove();
             Debug.Log($"Best move is from bottle №{bestMove.Item1} to bottle №{bestMove.Item2}");
         }
@@ -83,14 +82,9 @@ namespace Scenes.GameScene.Bottle
                 {
                     stopwatch.Stop();
                     Debug.Log($"Time to getting best move: {stopwatch.ElapsedMilliseconds} ms");
-                    return currentState.GetFirstMove(); // Восстанавливаем путь до решения и возвращаем первый ход
+                    return currentState.GetFirstMove();
                 }
 
-                // Получаем возможные ходы с применением эвристики
-                /*var availableMoves = currentState.GetAvailableMoves()
-                    .OrderByDescending(move => CalculateHeuristic(currentState, move.Item1, move.Item2))
-                    .ToList();
-                */
                 var availableMoves = currentState.GetAvailableMoves();
                 
                 foreach (var move in availableMoves)
