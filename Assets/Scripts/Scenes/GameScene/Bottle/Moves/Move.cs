@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace Scenes.GameScene.Bottle
+namespace Scenes.GameScene
 {
     public class Move
     {
