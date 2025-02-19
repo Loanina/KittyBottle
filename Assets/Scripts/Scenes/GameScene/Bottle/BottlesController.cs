@@ -1,24 +1,25 @@
 using System;
+using Scenes.GameScene.Bottle.Moves;
 using UnityEngine;
 using Zenject;
 
 namespace Scenes.GameScene.Bottle
 {
-    public class BottlesController
+    public class BottlesController : IBottleActionHandler
     {
-        private readonly BottlesContainer bottlesContainer;
+        private readonly IBottlesContainer bottlesContainer;
         private readonly MovesManager movesManager;
         private Bottle firstBottle;
         private Bottle secondBottle;
         
         [Inject]
-        public BottlesController(BottlesContainer container, MovesManager movesManager)
+        public BottlesController(IBottlesContainer container, MovesManager movesManager)
         {
             bottlesContainer = container;
             this.movesManager = movesManager;
         }
 
-        public void PeekBottle(Bottle bottle)
+        public void HandleBottleClick(Bottle bottle)
         {
             try
             {
@@ -58,7 +59,6 @@ namespace Scenes.GameScene.Bottle
             }
         }
 
-
         private void ClearSelection()
         {
             firstBottle = null;
@@ -95,8 +95,14 @@ namespace Scenes.GameScene.Bottle
                 ClearSelection();
             });
         }
-        
-        public void TransferColorWithoutAnimation(int from, int to, int countOfColorToTransfer)
+
+        private void ReturnMove()
+        {
+            var lastMove = movesManager.PopLastMove();
+            TransferColorWithoutAnimation(lastMove.from, lastMove.to, lastMove.countOfColorToTransfer);
+        }
+
+        private void TransferColorWithoutAnimation(int from, int to, int countOfColorToTransfer)
         {
             var bottleFrom = bottlesContainer.GetBottle(from);
             var bottleTo = bottlesContainer.GetBottle(to);

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Scenes.GameScene
+namespace Core.Hints
 {
     public class HintManager : MonoBehaviour
     {

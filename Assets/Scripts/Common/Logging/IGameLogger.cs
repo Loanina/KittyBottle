@@ -1,6 +1,6 @@
 ﻿namespace Common.Logging
 {
-    public interface ILogger
+    public interface IGameLogger
     {
         void Log(string message);
         void LogError(string message);

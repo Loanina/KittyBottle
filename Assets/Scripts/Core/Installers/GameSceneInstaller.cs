@@ -1,8 +1,10 @@
 ﻿using Common.DataManagement;
+using Common.Logging;
 using Core.Hints;
 using Core.SavingSystem;
 using Scenes.GameScene;
 using Scenes.GameScene.Bottle;
+using Scenes.GameScene.Bottle.Moves;
 using Scenes.GameScene.ColorPalette;
 using Scenes.GameScene.Level;
 using UnityEngine;
@@ -33,22 +35,19 @@ namespace Core.Installers
             Container.Bind<LevelColorMapper>().AsSingle();
             Container.Bind<LevelProvider>().AsSingle().WithArguments(levelCollection);
             Container.Bind<PlayerProgressService>().AsSingle().WithArguments(coinsPerLevel);
-            Container.Bind<ISaveSystem<PlayerData>>()
-                .To<SaveSystemAdapter<PlayerData>>()
-                .AsSingle();
+            Container.Bind<ISaveSystem<PlayerData>>().To<SaveSystemAdapter<PlayerData>>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelController>().AsSingle().WithArguments(hintManager);
-            Container.Bind<IMoveStrategy>()
-                .To<BfsMoveStrategy>()
-                .AsSingle();
-            Container.Bind<BottlesController>().AsSingle();
-            Container.Bind<MovesManager>().AsSingle();
-            Container.Bind<BottlesContainer>().AsSingle().WithArguments(layoutSettings, bottlesParentTransform);
             
+            Container.Bind<IBottleActionHandler>().To<BottlesController>().AsSingle();
+            Container.Bind<IBottlesContainer>().To<BottlesContainer>().AsSingle().WithArguments(layoutSettings, bottlesParentTransform);
             Container.Bind<IBottleFactory>()
                 .To<UnityBottleFactory>()
                 .AsSingle()
                 .WithArguments(bottlePrefab);
 
+            Container.Bind<MovesManager>().AsSingle();
+            Container.Bind<BestMoveFinder>().AsSingle();
+            Container.Bind<IGameLogger>().To<GameLogger>().AsSingle();
             Debug.Log("Game scene data loaded");
         }
     }

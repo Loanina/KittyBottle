@@ -7,18 +7,21 @@ using Zenject;
 
 namespace Core.Hints
 {
-    public class BfsMoveStrategy : IMoveStrategy
+    public class BestMoveFinder
     {
-        private readonly ILogger logger;
+        private readonly IGameLogger logger;
+        private readonly IBottlesContainer bottlesContainer;
 
         [Inject]
-        public BfsMoveStrategy(ILogger logger)
+        public BestMoveFinder(IGameLogger logger, IBottlesContainer bottlesContainer)
         {
             this.logger = logger;
+            this.bottlesContainer = bottlesContainer;
         }
         
-        public (int, int) FindBestMove(IReadOnlyList<BottleState> bottles)
+        public (int, int) FindBestMove()
         {
+            var bottles = bottlesContainer.GetAllBottles();
             var stopwatch = Stopwatch.StartNew();
             var queue = new Queue<BottlesContainerState>();
             var visitedStates = new HashSet<string>();
@@ -56,7 +59,6 @@ namespace Core.Hints
             return (-1, -1);
         }
         
-        // Функция эвристики: даем приоритет ходам, которые приближают бутылку к завершенному состоянию
         private int CalculateHeuristic(BottlesContainerState state, int fromIndex, int toIndex)
         {
             BottleState fromBottle = state.GetBottle(fromIndex);

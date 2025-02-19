@@ -1,4 +1,5 @@
 using System;
+using Core.Hints;
 using Core.SavingSystem;
 using Scenes.GameScene.Bottle;
 using Zenject;
@@ -10,7 +11,7 @@ namespace Scenes.GameScene.Level
         private int currentLevelIndex;
     
         private readonly LevelProvider levelProvider;
-        private readonly BottlesContainer bottlesContainer;
+        private readonly IBottlesContainer bottlesContainer;
         private readonly LevelColorMapper colorMapper;
         private readonly PlayerProgressService progressService;
         private readonly HintManager hintManager;
@@ -18,7 +19,7 @@ namespace Scenes.GameScene.Level
         [Inject]
         public LevelController(
             LevelProvider levelProvider,
-            BottlesContainer bottlesContainer,
+            IBottlesContainer bottlesContainer,
             LevelColorMapper colorMapper,
             PlayerProgressService progressService,
             HintManager hintManager)
@@ -44,7 +45,6 @@ namespace Scenes.GameScene.Level
         private void SubscribeToEvents()
         {
             bottlesContainer.OnLevelComplete += HandleLevelComplete;
-            hintManager.OnBestMoveRequested += bottlesContainer.CalculateBestMove;
             hintManager.OnRestartRequested += OnRestartLevel;
         }
 
@@ -77,7 +77,6 @@ namespace Scenes.GameScene.Level
         public void Dispose()
         {
             bottlesContainer.OnLevelComplete -= HandleLevelComplete;
-            hintManager.OnBestMoveRequested -= bottlesContainer.CalculateBestMove;
             hintManager.OnRestartRequested -= OnRestartLevel;
         }
     }
