@@ -4,20 +4,24 @@ using System.Collections.Generic;
 using Core.InputSystem;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Rendering;
+using Zenject;
 using Debug = UnityEngine.Debug;
 
 namespace Scenes.GameScene.Bottle
 {
     public class Bottle : MonoBehaviour, IClickable
     {
-        [SerializeField] private BottleShaderController shaderController;
-        [SerializeField] private PouringAnimationController pouringAnimationController;
-        [SerializeField] private SortingGroup sortingGroup;
-        [SerializeField] private Transform rightPouringPoint;
-        [SerializeField] private Transform leftPouringPoint;
-        [SerializeField] private Transform rightRotationPoint;
-        [SerializeField] private Transform leftRotationPoint;
+        private readonly BottleShaderController shaderController;
+        private readonly PouringAnimationController pouringAnimationController;
+        private readonly BottleView view;
+
+        [Inject]
+        public Bottle(BottleShaderController shaderController, PouringAnimationController pouringAnimationController, BottleView view)
+        {
+            this.shaderController = shaderController;
+            this.pouringAnimationController = pouringAnimationController;
+            this.view = view;
+        }
         
         private Vector3 chosenPouringPoint;
         private Vector3 defaultPosition;
@@ -46,20 +50,20 @@ namespace Scenes.GameScene.Bottle
         {
             if (transform.position.x > positionOfTargetBottleX && transform.localPosition.x <= 0.31) 
             {
-                pouringAnimationController.SetRotationPoint(leftRotationPoint);
-                chosenPouringPoint = rightPouringPoint.localPosition;
+                pouringAnimationController.SetRotationPoint(view.leftRotationPoint);
+                chosenPouringPoint = view.rightPouringPoint.localPosition;
                 pouringAnimationController.SetDirectionMultiplier(-1.0f);
             }
             else if (transform.localPosition.x >= -0.31)
             {
-                pouringAnimationController.SetRotationPoint(rightRotationPoint);
-                chosenPouringPoint = leftPouringPoint.localPosition;
+                pouringAnimationController.SetRotationPoint(view.rightRotationPoint);
+                chosenPouringPoint = view.leftPouringPoint.localPosition;
                 pouringAnimationController.SetDirectionMultiplier(1.0f);
             }
             else
             {
-                pouringAnimationController.SetRotationPoint(leftRotationPoint);
-                chosenPouringPoint = rightPouringPoint.localPosition;
+                pouringAnimationController.SetRotationPoint(view.leftRotationPoint);
+                chosenPouringPoint = view.rightPouringPoint.localPosition;
                 pouringAnimationController.SetDirectionMultiplier(-1.0f);
             }
         }
@@ -142,12 +146,12 @@ namespace Scenes.GameScene.Bottle
 
         private void SetSortingOrderDown()
         {
-            sortingGroup.sortingOrder = 1;
+            view.sortingGroup.sortingOrder = 1;
         }
 
         private void SetSortingOrderUp()
         {
-            sortingGroup.sortingOrder = 2;
+            view.sortingGroup.sortingOrder = 2;
         }
 
         public bool EnableToFillBottle(Color color)

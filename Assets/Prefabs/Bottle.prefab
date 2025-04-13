@@ -261,9 +261,10 @@ GameObject:
   - component: {fileID: 2795296273117742065}
   - component: {fileID: 5699146102140144351}
   - component: {fileID: 8723869106329755495}
-  - component: {fileID: 2172642616759441303}
-  - component: {fileID: 1787941994570090916}
+  - component: {fileID: 5622288443558678666}
   - component: {fileID: 497448656567830007}
+  - component: {fileID: 1196075937752760621}
+  - component: {fileID: 5425939169602216376}
   m_Layer: 0
   m_Name: Bottle
   m_TagString: Untagged
@@ -368,209 +369,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab26f0aee97496e4087fe332a87e0838, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderController: {fileID: 2172642616759441303}
-  pouringAnimationController: {fileID: 1787941994570090916}
+--- !u!114 &5622288443558678666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2756004340193633207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 336837e570ef47e98f40ad02e8858c19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glassTransform: {fileID: 7228459649763321498}
+  rightColorFlow: {fileID: 1738341055423501178}
+  leftColorFlow: {fileID: 2915048618790360195}
+  bottleMaskSR: {fileID: 4187239836257889833}
   sortingGroup: {fileID: 5699146102140144351}
   rightPouringPoint: {fileID: 5215034943167253716}
   leftPouringPoint: {fileID: 2124948379449813473}
   rightRotationPoint: {fileID: 8283083381133557019}
   leftRotationPoint: {fileID: 3581949798412607547}
---- !u!114 &2172642616759441303
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2756004340193633207}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba6fd75b2b4ce44fb40e2a798b74e80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bottleMaskSR: {fileID: 4187239836257889833}
-  scaleAndRotationMultiplierCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0.0002047611
-      outSlope: 0.0002047611
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.36873147
-    - serializedVersion: 3
-      time: 45
-      value: 0.82
-      inSlope: -0.01303928
-      outSlope: -0.01303928
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.10766983
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 67.5
-      value: 0.53
-      inSlope: -0.011851852
-      outSlope: -0.011851852
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 78.75
-      value: 0.42
-      inSlope: -0.012154696
-      outSlope: -0.012154696
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 85.6
-      value: 0.31
-      inSlope: -0.014222221
-      outSlope: -0.014222221
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 90
-      value: 0.26
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 0
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  fillAmountCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.68
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 43
-      value: 0.68
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 48
-      value: 0.62
-      inSlope: -0.009795919
-      outSlope: -0.009795919
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 67.5
-      value: 0.26
-      inSlope: -0.025365852
-      outSlope: -0.025365852
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 78.75
-      value: -0.16
-      inSlope: -0.046408843
-      outSlope: -0.046408843
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 85.6
-      value: -0.58
-      inSlope: -0.07466667
-      outSlope: -0.07466667
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 90
-      value: -1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 0
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  fillAmountValues:
-  - -1
-  - -0.58
-  - -0.16
-  - 0.26
-  - 0.68
-  maxColorsInBottle: 4
---- !u!114 &1787941994570090916
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2756004340193633207}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8cd7f619e9b4bc428118c4ce49f75f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotationValues:
-  - 33
-  - 67.5
-  - 78.75
-  - 85.6
-  - 90
-  timeRotation: 0.7
-  timeMove: 0.5
-  glassTransform: {fileID: 7228459649763321498}
-  rightColorFlow: {fileID: 1738341055423501178}
-  leftColorFlow: {fileID: 2915048618790360195}
-  rotationSpeedMultiplier:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!61 &497448656567830007
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -617,6 +436,40 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.37997636, y: 1.107165}
   m_EdgeRadius: 0
+--- !u!114 &1196075937752760621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2756004340193633207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08eca9f7688a0a24685b89133b020c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _scriptableObjectInstallers: []
+  _monoInstallers:
+  - {fileID: 5425939169602216376}
+  _installerPrefabs: []
+  _autoRun: 1
+  _kernel: {fileID: 0}
+--- !u!114 &5425939169602216376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2756004340193633207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6672c1c24aba4cfa9435b1646b8f8191, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bottle: {fileID: 8723869106329755495}
+  view: {fileID: 5622288443558678666}
+  shaderConfig: {fileID: 11400000, guid: f62169b382a29a74981275663d0861e4, type: 2}
+  pouringAnimationConfig: {fileID: 11400000, guid: 049f2bcb9f211d84ba23f29f306fe5ef, type: 2}
 --- !u!1 &4570087112361650040
 GameObject:
   m_ObjectHideFlags: 0
