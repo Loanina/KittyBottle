@@ -144,9 +144,14 @@ namespace Scenes.GameScene.Bottle
                 bottleMaskSR.material.GetFloat(FillAmount) + fillAmountToAdd);
         }
 
-        public bool IsBottleEmpty()
+        public bool IsEmpty()
         {
             return _bottleColors.Count == 0;
+        }
+
+        public bool IsFull()
+        {
+            return _bottleColors.Count == maxColorsInBottle;
         }
     }
 }

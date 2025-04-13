@@ -36,8 +36,10 @@ namespace Core.Installers
             Container.Bind<PlayerProgressService>().AsSingle().WithArguments(coinsPerLevel);
             Container.Bind<ISaveSystem<PlayerData>>().To<SaveSystemAdapter<PlayerData>>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelController>().AsSingle().WithArguments(hintManager);
+            Container.Bind<LevelCompletionChecker>().AsSingle();
+            Container.BindInterfacesAndSelfTo<LevelProgressHandler>().AsSingle();
             
-            Container.BindInterfacesTo<BottlesController>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BottlesController>().AsSingle();
             Container.Bind<BottlesContainer>().AsSingle().WithArguments(layoutSettings, bottlesParentTransform);
             Container.Bind<IBottleFactory>()
                 .To<BottleFactory>()

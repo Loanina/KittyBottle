@@ -37,14 +37,12 @@ namespace Scenes.GameScene.Level
             SubscribeToEvents();
             LoadLevel();
         }
-    
-
+        
         private int LoadProgress() => 
             progressService.GetLastCompletedLevel() + 1;
 
         private void SubscribeToEvents()
         {
-            bottlesContainer.OnLevelComplete += HandleLevelComplete;
             hintManager.OnRestartRequested += OnRestartLevel;
         }
 
@@ -60,7 +58,7 @@ namespace Scenes.GameScene.Level
             bottlesContainer.CreateBottles(colors);
         }
 
-        private void HandleLevelComplete()
+        public void HandleLevelComplete()
         {
             progressService.UpdateProgress(currentLevelIndex);
             bottlesContainer.DeleteBottles();
@@ -76,7 +74,6 @@ namespace Scenes.GameScene.Level
 
         public void Dispose()
         {
-            bottlesContainer.OnLevelComplete -= HandleLevelComplete;
             hintManager.OnRestartRequested -= OnRestartLevel;
         }
     }

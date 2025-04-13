@@ -12,6 +12,8 @@ namespace Scenes.GameScene.Bottle
         private Bottle firstBottle;
         private Bottle secondBottle;
         
+        public event Action OnPouringEnd;
+        
         [Inject]
         public BottlesController(BottlesContainer bottlesContainer, MovesManager movesManager)
         {
@@ -39,7 +41,6 @@ namespace Scenes.GameScene.Bottle
             {
                 bottle.OnClicked += OnBottleClicked;
             }
-            Debug.Log("Subscribe on click");
         }
         
         private void OnBottlesDeleted()
@@ -52,7 +53,6 @@ namespace Scenes.GameScene.Bottle
             try
             {
                 if (bottle == null) return;
-                Debug.Log("OnBottleClick");
                 
                 if (firstBottle == null)
                 {
@@ -126,6 +126,7 @@ namespace Scenes.GameScene.Bottle
                     transferAmount
                 );
                 */
+                OnPouringEnd?.Invoke();
             });
         }
 

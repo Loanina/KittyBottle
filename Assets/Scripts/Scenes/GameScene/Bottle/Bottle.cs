@@ -24,8 +24,6 @@ namespace Scenes.GameScene.Bottle
         public bool InUse { get; private set; }
         public int UsesCount { get; private set; }
         public event Action<Bottle> OnClicked;
-        
-        public event Action OnPouringEnd;
 
         public void Initialize(List<Color> bottleColors)
         {
@@ -140,7 +138,6 @@ namespace Scenes.GameScene.Bottle
             if (activeCoroutines != 0 || !sequenceCompleted) return;
             InUse = false;
             SetSortingOrderDown();
-            OnPouringEnd?.Invoke();
         }
 
         private void SetSortingOrderDown()
@@ -165,8 +162,10 @@ namespace Scenes.GameScene.Bottle
 
         public bool IsEmpty()
         {
-            return shaderController.IsBottleEmpty();
+            return shaderController.IsEmpty();
         }
+
+        public bool IsFull() => shaderController.IsFull();
 
         public int GetNumberOfTopColorLayers()
         {
