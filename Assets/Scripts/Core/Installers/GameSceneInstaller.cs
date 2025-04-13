@@ -2,7 +2,6 @@
 using Common.Logging;
 using Core.Hints;
 using Core.SavingSystem;
-using Scenes.GameScene;
 using Scenes.GameScene.Bottle;
 using Scenes.GameScene.Bottle.Moves;
 using Scenes.GameScene.ColorPalette;
@@ -38,10 +37,10 @@ namespace Core.Installers
             Container.Bind<ISaveSystem<PlayerData>>().To<SaveSystemAdapter<PlayerData>>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelController>().AsSingle().WithArguments(hintManager);
             
-            Container.Bind<IBottleActionHandler>().To<BottlesController>().AsSingle();
-            Container.Bind<IBottlesContainer>().To<BottlesContainer>().AsSingle().WithArguments(layoutSettings, bottlesParentTransform);
+            Container.BindInterfacesTo<BottlesController>().AsSingle();
+            Container.Bind<BottlesContainer>().AsSingle().WithArguments(layoutSettings, bottlesParentTransform);
             Container.Bind<IBottleFactory>()
-                .To<UnityBottleFactory>()
+                .To<BottleFactory>()
                 .AsSingle()
                 .WithArguments(bottlePrefab);
 

@@ -1,7 +1,9 @@
-﻿namespace Core.InputSystem
+﻿using UnityEngine;
+
+namespace Core.InputSystem
 {
     public class InputSignal
     {
-        public IClickable Target;
+        public Vector2 ScreenPosition;
     }
 }

@@ -1,6 +1,7 @@
-﻿using Zenject;
+﻿using Core.InputSystem;
+using Zenject;
 
-namespace Core.InputSystem
+namespace Core.Installers
 {
     public class InputInstaller : MonoInstaller
     {
@@ -8,9 +9,8 @@ namespace Core.InputSystem
         {
             SignalBusInstaller.Install(Container);
             Container.DeclareSignal<InputSignal>();
-
-            Container.BindInterfacesAndSelfTo<ClickableObject>().AsSingle();
-            Container.BindInterfacesAndSelfTo<InputHandler>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<InputHandler>().AsSingle();
+            Container.BindInterfacesTo<InputRaycaster>().AsSingle();
         }
     }
 }

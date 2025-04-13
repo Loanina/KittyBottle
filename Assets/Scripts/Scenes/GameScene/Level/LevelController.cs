@@ -11,7 +11,7 @@ namespace Scenes.GameScene.Level
         private int currentLevelIndex;
     
         private readonly LevelProvider levelProvider;
-        private readonly IBottlesContainer bottlesContainer;
+        private readonly BottlesContainer bottlesContainer;
         private readonly LevelColorMapper colorMapper;
         private readonly PlayerProgressService progressService;
         private readonly HintManager hintManager;
@@ -19,7 +19,7 @@ namespace Scenes.GameScene.Level
         [Inject]
         public LevelController(
             LevelProvider levelProvider,
-            IBottlesContainer bottlesContainer,
+            BottlesContainer bottlesContainer,
             LevelColorMapper colorMapper,
             PlayerProgressService progressService,
             HintManager hintManager)

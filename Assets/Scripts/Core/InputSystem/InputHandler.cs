@@ -5,55 +5,25 @@ namespace Core.InputSystem
 {
     public class InputHandler : ITickable
     {
-        private SignalBus signalBus;
+        private readonly SignalBus signalBus;
 
         [Inject]
-        public InputHandler(SignalBus signalBus)
-        {
-            this.signalBus = signalBus;
-        }
+        public InputHandler(SignalBus signalBus) => this.signalBus = signalBus;
 
         public void Tick()
         {
 #if UNITY_EDITOR
-            HandleMouseInput();
+            if (Input.GetMouseButtonDown(0))
+                SendInput(Input.mousePosition);
 #else
-            HandleTouchInput();
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            SendInput(Input.GetTouch(0).position);
 #endif
         }
 
-        private void HandleMouseInput()
+        private void SendInput(Vector2 screenPos)
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                ProcessInput(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            }
-        }
-
-        private void HandleTouchInput()
-        {
-            if (Input.touchCount > 0)
-            {
-                foreach (Touch touch in Input.touches)
-                {
-                    if (touch.phase == TouchPhase.Began)
-                    {
-                        ProcessInput(Camera.main.ScreenToWorldPoint(touch.position));
-                    }
-                }
-            }
-        }
-
-        private void ProcessInput(Vector2 position)
-        {
-            if (Camera.main != null)
-            {
-                var hit = Physics2D.OverlapPoint(position);
-                if (hit != null && hit.TryGetComponent(out IClickable clickable))
-                {
-                    signalBus.Fire(new InputSignal { Target = clickable });
-                }
-            }
+            signalBus.Fire(new InputSignal { ScreenPosition = screenPos });
         }
     }
 }

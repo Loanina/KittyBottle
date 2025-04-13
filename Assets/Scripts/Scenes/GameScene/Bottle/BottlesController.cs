@@ -5,29 +5,62 @@ using Zenject;
 
 namespace Scenes.GameScene.Bottle
 {
-    public class BottlesController : IBottleActionHandler
+    public class BottlesController : IInitializable, IDisposable
     {
-        private readonly IBottlesContainer bottlesContainer;
+        private readonly BottlesContainer bottlesContainer;
         private readonly MovesManager movesManager;
         private Bottle firstBottle;
         private Bottle secondBottle;
         
         [Inject]
-        public BottlesController(IBottlesContainer container, MovesManager movesManager)
+        public BottlesController(BottlesContainer bottlesContainer, MovesManager movesManager)
         {
-            bottlesContainer = container;
+            this.bottlesContainer = bottlesContainer;
             this.movesManager = movesManager;
         }
+        
+        public void Initialize()
+        {
+            bottlesContainer.OnBottlesCreated += OnBottlesCreated;
+            bottlesContainer.OnBottlesDeleted += OnBottlesDeleted;
+            if (bottlesContainer.GetAllBottles()?.Count > 0)
+                OnBottlesCreated(bottlesContainer.GetAllBottles());
+        }
 
-        public void HandleBottleClick(Bottle bottle)
+        public void Dispose()
+        {
+            bottlesContainer.OnBottlesCreated -= OnBottlesCreated;
+            bottlesContainer.OnBottlesDeleted -= OnBottlesDeleted;
+        }
+        
+        private void OnBottlesCreated(System.Collections.Generic.List<Bottle> bottles)
+        {
+            foreach (var bottle in bottles)
+            {
+                bottle.OnClicked += OnBottleClicked;
+            }
+            Debug.Log("Subscribe on click");
+        }
+        
+        private void OnBottlesDeleted()
+        {
+            ClearSelection();
+        }
+        
+        public void OnBottleClicked(Bottle bottle)
         {
             try
             {
                 if (bottle == null) return;
-
+                Debug.Log("OnBottleClick");
+                
                 if (firstBottle == null)
                 {
-                    if (bottle.InUse || bottle.UsesCount > 0) return;
+                    if (bottle.InUse || bottle.UsesCount > 0)
+                    {
+                        Debug.Log("In use: "+bottle.InUse + " bottle uses count:" + bottle.UsesCount);
+                        return;
+                    }
                     firstBottle = bottle;
                     firstBottle.GoUp();
                     Debug.Log("First bottle selected");
@@ -83,16 +116,16 @@ namespace Scenes.GameScene.Bottle
             }
 
             var transferAmount = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
-            secondBottle.IncreaseUsagesCount();
             
             firstBottle.PouringColorsBetweenBottles(secondBottle, () => 
             {
+                /*
                 movesManager.AddMove(
                     bottlesContainer.GetIndexOfBottle(firstBottle),
                     bottlesContainer.GetIndexOfBottle(secondBottle),
                     transferAmount
                 );
-                ClearSelection();
+                */
             });
         }
 

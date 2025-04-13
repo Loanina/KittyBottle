@@ -1,5 +1,4 @@
-﻿using Common.Logging;
-using Zenject;
+﻿using Zenject;
 
 namespace Core.Installers
 {
@@ -7,7 +6,6 @@ namespace Core.Installers
     {
         public override void InstallBindings()
         {
-            
         }
     }
 }

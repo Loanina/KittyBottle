@@ -10,10 +10,10 @@ namespace Core.Hints
     public class BestMoveFinder
     {
         private readonly IGameLogger logger;
-        private readonly IBottlesContainer bottlesContainer;
+        private readonly BottlesContainer bottlesContainer;
 
         [Inject]
-        public BestMoveFinder(IGameLogger logger, IBottlesContainer bottlesContainer)
+        public BestMoveFinder(IGameLogger logger, BottlesContainer bottlesContainer)
         {
             this.logger = logger;
             this.bottlesContainer = bottlesContainer;

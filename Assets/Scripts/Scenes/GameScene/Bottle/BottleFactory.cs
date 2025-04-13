@@ -3,12 +3,12 @@ using Zenject;
 
 namespace Scenes.GameScene.Bottle
 {
-    public class UnityBottleFactory : IBottleFactory
+    public class BottleFactory : IBottleFactory
     {
         private readonly Bottle bottlePrefab;
 
         [Inject]
-        public UnityBottleFactory(Bottle bottlePrefab)
+        public BottleFactory(Bottle bottlePrefab)
         {
             this.bottlePrefab = bottlePrefab;
         }

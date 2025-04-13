@@ -7,7 +7,7 @@ using Zenject;
 
 namespace Scenes.GameScene.Bottle
 {
-    public class BottlesContainer : IBottlesContainer
+    public class BottlesContainer
     {
         private readonly IBottleFactory bottleFactory;
         private readonly LayoutSettings layoutSettings;
@@ -15,6 +15,8 @@ namespace Scenes.GameScene.Bottle
         private readonly IGameLogger logger;
         
         private List<Bottle> bottles;
+        public event Action<List<Bottle>> OnBottlesCreated;
+        public event Action OnBottlesDeleted;
         public event Action OnLevelComplete;
 
         [Inject]
@@ -43,6 +45,8 @@ namespace Scenes.GameScene.Bottle
                 bottle.OnPouringEnd += CheckLevelCompletion;
                 bottles.Add(bottle);
             }
+            OnBottlesCreated?.Invoke(bottles);
+            Debug.Log("OnBottlesCreated");
         }
 
         public void DeleteBottles()
@@ -55,6 +59,7 @@ namespace Scenes.GameScene.Bottle
                 bottleFactory.DestroyBottle(bottle);
             }
             bottles.Clear();
+            OnBottlesDeleted?.Invoke();
         }
 
         private void CheckLevelCompletion()

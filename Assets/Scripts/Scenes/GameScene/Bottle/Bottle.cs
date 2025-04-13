@@ -23,8 +23,8 @@ namespace Scenes.GameScene.Bottle
         private Vector3 defaultPosition;
         public bool InUse { get; private set; }
         public int UsesCount { get; private set; }
+        public event Action<Bottle> OnClicked;
         
-        public event Action<Bottle> OnClickEvent;
         public event Action OnPouringEnd;
 
         public void Initialize(List<Color> bottleColors)
@@ -37,6 +37,11 @@ namespace Scenes.GameScene.Bottle
         {
             defaultPosition = transform.position;
             Debug.Log($"def position in init {defaultPosition}");
+        }
+        
+        public void OnClick()
+        {
+            OnClicked?.Invoke(this);
         }
     
         public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
@@ -186,11 +191,6 @@ namespace Scenes.GameScene.Bottle
         public void DecreaseUsagesCount()
         {
             if (UsesCount > 0) UsesCount -= 1;
-        }
-        
-        public void OnClick()
-        {
-            OnClickEvent?.Invoke(this);
         }
     }
 }
