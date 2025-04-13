@@ -47,8 +47,8 @@ namespace Scenes.GameScene.Bottle
         {
             ClearSelection();
         }
-        
-        public void OnBottleClicked(Bottle bottle)
+
+        private void OnBottleClicked(Bottle bottle)
         {
             try
             {
@@ -56,11 +56,7 @@ namespace Scenes.GameScene.Bottle
                 
                 if (firstBottle == null)
                 {
-                    if (bottle.InUse || bottle.UsesCount > 0)
-                    {
-                        Debug.Log("In use: "+bottle.InUse + " bottle uses count:" + bottle.UsesCount);
-                        return;
-                    }
+                    if (bottle.InUse || bottle.UsesCount > 0) return;
                     firstBottle = bottle;
                     firstBottle.GoUp();
                     Debug.Log("First bottle selected");
@@ -73,11 +69,7 @@ namespace Scenes.GameScene.Bottle
                 }
                 else
                 {
-                    if (bottle.InUse)
-                    {
-                        Debug.Log("Target bottle is in use");
-                        return;
-                    }
+                    if (bottle.InUse) return;
 
                     Debug.Log("Second bottle selected");
                     secondBottle = bottle;
@@ -115,7 +107,7 @@ namespace Scenes.GameScene.Bottle
                 return;
             }
 
-            var transferAmount = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
+            // var transferAmount = secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers());
             
             firstBottle.PouringColorsBetweenBottles(secondBottle, () => 
             {

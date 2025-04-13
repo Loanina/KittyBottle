@@ -35,7 +35,7 @@ namespace Scenes.GameScene.Level
         {
             currentLevelIndex = LoadProgress();
             SubscribeToEvents();
-            LoadLevel();
+            LoadLevel(currentLevelIndex);
         }
         
         private int LoadProgress() => 
@@ -46,14 +46,14 @@ namespace Scenes.GameScene.Level
             hintManager.OnRestartRequested += OnRestartLevel;
         }
 
-        private void LoadLevel()
+        private void LoadLevel(int index)
         {
-            if (!levelProvider.HasLevel(currentLevelIndex))
+            if (!levelProvider.HasLevel(index))
             {
-                throw new ArgumentOutOfRangeException(nameof(currentLevelIndex));
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            var levelData = levelProvider.GetLevel(currentLevelIndex);
+            var levelData = levelProvider.GetLevel(index);
             var colors = colorMapper.MapLevelDataToColors(levelData);
             bottlesContainer.CreateBottles(colors);
         }
@@ -63,13 +63,13 @@ namespace Scenes.GameScene.Level
             progressService.UpdateProgress(currentLevelIndex);
             bottlesContainer.DeleteBottles();
             currentLevelIndex++;
-            LoadLevel();
+            LoadLevel(currentLevelIndex);
         }
 
         private void OnRestartLevel()
         {
             bottlesContainer.DeleteBottles();
-            LoadLevel();
+            LoadLevel(currentLevelIndex);
         }
 
         public void Dispose()
