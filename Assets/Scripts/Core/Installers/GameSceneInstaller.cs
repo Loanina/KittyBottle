@@ -40,11 +40,10 @@ namespace Core.Installers
             Container.BindInterfacesAndSelfTo<LevelProgressHandler>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<BottlesController>().AsSingle();
-            Container.Bind<BottlesContainer>().AsSingle().WithArguments(layoutSettings, bottlesParentTransform);
-            Container.Bind<IBottleFactory>()
-                .To<BottleFactory>()
-                .AsSingle()
-                .WithArguments(bottlePrefab);
+            Container.Bind<BottlesContainer>().AsSingle().WithArguments(layoutSettings);
+            Container.BindFactory<Bottle, BottleFactory>()
+                .FromComponentInNewPrefab(bottlePrefab)
+                .UnderTransform(bottlesParentTransform);
 
             Container.Bind<MovesManager>().AsSingle();
             Container.Bind<BestMoveFinder>().AsSingle();

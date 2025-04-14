@@ -7,9 +7,8 @@ namespace Scenes.GameScene.Bottle
 {
     public class BottlesContainer
     {
-        private readonly IBottleFactory bottleFactory;
+        private readonly BottleFactory bottleFactory;
         private readonly LayoutSettings layoutSettings;
-        private readonly Transform parent;
 
         private List<Bottle> bottles;
         public event Action<List<Bottle>> OnBottlesCreated;
@@ -19,10 +18,9 @@ namespace Scenes.GameScene.Bottle
         public BottlesContainer(
             LayoutSettings layoutSettings,
             Transform parent,
-            IBottleFactory bottleFactory)
+            BottleFactory bottleFactory)
         {
             this.layoutSettings = layoutSettings;
-            this.parent = parent;
             this.bottleFactory = bottleFactory;
         }
 
@@ -33,8 +31,8 @@ namespace Scenes.GameScene.Bottle
 
             for (var i = 0; i < colors.Count; i++)
             {
-                var position = parent.TransformPoint(layout[i]);
-                var bottle = bottleFactory.CreateBottle(position, parent);
+                var bottle = bottleFactory.Create();
+                bottle.transform.localPosition = layout[i];
                 bottle.Initialize(colors[i]);
                 bottles.Add(bottle);
             }
@@ -47,7 +45,7 @@ namespace Scenes.GameScene.Bottle
 
             foreach (var bottle in bottles)
             {
-                bottleFactory.DestroyBottle(bottle);
+                UnityEngine.Object.Destroy(bottle.gameObject);
             }
             bottles.Clear();
             OnBottlesDeleted?.Invoke();

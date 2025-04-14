@@ -11,16 +11,17 @@ namespace Scenes.GameScene.Bottle
 {
     public class Bottle : MonoBehaviour, IClickable
     {
-        private readonly BottleShaderController shaderController;
-        private readonly PouringAnimationController pouringAnimationController;
-        private readonly BottleView view;
+        private BottleShaderController shaderController;
+        private PouringAnimationController pouringAnimationController;
+        private BottleView view;
 
         [Inject]
-        public Bottle(BottleShaderController shaderController, PouringAnimationController pouringAnimationController, BottleView view)
+        public void Construct(BottleShaderController shaderController, PouringAnimationController pouringAnimationController, BottleView view)
         {
             this.shaderController = shaderController;
             this.pouringAnimationController = pouringAnimationController;
             this.view = view;
+            Debug.Log("Все проинжектировалось");
         }
         
         private Vector3 chosenPouringPoint;
