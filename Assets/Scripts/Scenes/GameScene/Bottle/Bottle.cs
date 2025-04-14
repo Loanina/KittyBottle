@@ -55,9 +55,7 @@
                 var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(GetNumberOfTopColorLayers());
                 var colorToTransfer = GetTopColor();
                 targetBottle.AddColor(countOfColorToTransfer, colorToTransfer);
-    
                 targetBottle.IncreaseUsagesCount();
-                bottleAnimationController.ChooseRotationPointAndDirection(targetBottle.transform.position.x);
                 InUse = true;
                 SetSortingOrderUp();
 
@@ -69,7 +67,6 @@
                         targetBottle,
                         colorToTransfer,
                         countOfColorToTransfer,
-                        shaderController,
                         ct
                     );
                     InUse = false;

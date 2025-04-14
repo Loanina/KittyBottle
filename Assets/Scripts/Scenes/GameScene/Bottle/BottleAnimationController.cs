@@ -10,19 +10,21 @@ namespace Scenes.GameScene.Bottle
     public class BottleAnimationController
     {
         private readonly BottleAnimationConfig config;
+        private readonly BottleShaderController shaderController;
         private readonly BottleView view;
         private readonly Transform bottleTransform;
         private Vector3 chosenPouringPoint;
-        private Vector3 chosenRotationPoint;
+        private Transform chosenRotationPoint;
         private Vector3 defaultPosition;
         private float directionMultiplier = 1.0f;
 
         [Inject]
-        public BottleAnimationController(BottleAnimationConfig config, BottleView view, Transform bottleTransform)
+        public BottleAnimationController(BottleShaderController shaderController, BottleAnimationConfig config, BottleView view, Transform bottleTransform)
         {
             this.config = config;
             this.view = view;
             this.bottleTransform = bottleTransform;
+            this.shaderController = shaderController;
         }
         
         public void SetDefaultPosition()
@@ -30,11 +32,8 @@ namespace Scenes.GameScene.Bottle
             defaultPosition = bottleTransform.position;
             Debug.Log($"def position in init {defaultPosition}");
         }
-        private void SetRotationPoint(Vector3 point) => chosenRotationPoint = point;
-        private void SetDirectionMultiplier(float value) => directionMultiplier = value;
-        
 
-        private async UniTask RotateBottleBeforePouringAsync(BottleShaderController shaderController, CancellationToken cancellationToken)
+        private async UniTask RotateBottleBeforePouringAsync(CancellationToken cancellationToken)
         {
             var finishAngle = config.rotationValues[shaderController.CalculateStartPouringIndex()] * directionMultiplier;
             var time = 0.0f;
@@ -47,7 +46,7 @@ namespace Scenes.GameScene.Bottle
 
                 var lerpValue = time / config.timeMove;
                 angleValue = Mathf.Lerp(0.0f, finishAngle, lerpValue);
-                view.glassTransform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
+                view.glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue);
 
                 time += Time.deltaTime;
@@ -58,7 +57,7 @@ namespace Scenes.GameScene.Bottle
         }
 
         private async UniTask RotateBottleWithPouringAsync(Bottle targetBottle, Color colorToTransfer, int countOfColorToTransfer,
-            BottleShaderController shaderController, CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             var rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle(countOfColorToTransfer);
             var time = 0.0f;
@@ -77,7 +76,7 @@ namespace Scenes.GameScene.Bottle
 
                 var lerpValue = time / config.timeRotation;
                 angleValue = Mathf.Lerp(firstAngleValue, directionMultiplier * config.rotationValues[rotationIndex], lerpValue);
-                view.glassTransform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
+                view.glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
                 //time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
                 time += Time.deltaTime;
@@ -92,7 +91,7 @@ namespace Scenes.GameScene.Bottle
             shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
         }
 
-        private async UniTask RotateBottleBackAsync(BottleShaderController shaderController, CancellationToken cancellationToken)
+        private async UniTask RotateBottleBackAsync(CancellationToken cancellationToken)
         {
             var time = 0.0f;
             float angleValue;
@@ -108,7 +107,7 @@ namespace Scenes.GameScene.Bottle
 
                 var lerpValue = time / config.timeMove;
                 angleValue = Mathf.Lerp(firstAngleValue, 0.0f, lerpValue);
-                view.glassTransform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
+                view.glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShaderBack(angleValue);
 
                 time += Time.deltaTime;
@@ -131,32 +130,31 @@ namespace Scenes.GameScene.Bottle
             angle = Mathf.Abs(angle);
             return angle;
         }
-        
-        public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
+
+        private void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
         {
             if (bottleTransform.position.x > positionOfTargetBottleX && bottleTransform.localPosition.x <= config.leftEdgeThreshold) 
             {
-                SetRotationPoint(view.leftRotationPoint.position);
+                chosenRotationPoint = view.leftRotationPoint;
                 chosenPouringPoint = view.rightPouringPoint.localPosition;
-                SetDirectionMultiplier(-1.0f);    
+                directionMultiplier = -1.0f;    
             }
             else if (bottleTransform.localPosition.x >= -1 * config.leftEdgeThreshold)
             {
-                SetRotationPoint(view.rightRotationPoint.position);
+                chosenRotationPoint = view.rightRotationPoint;
                 chosenPouringPoint = view.leftPouringPoint.localPosition;
-                SetDirectionMultiplier(1.0f);
+                directionMultiplier = 1.0f;
             }
             else
             {
-                SetRotationPoint(view.leftRotationPoint.position);
+                chosenRotationPoint = view.leftRotationPoint;
                 chosenPouringPoint = view.rightPouringPoint.localPosition;
-                SetDirectionMultiplier(-1.0f);
+                directionMultiplier = -1.0f;
             }
         }
         
         public void GoUp()
         {
-            
             bottleTransform.DOMoveY(defaultPosition.y + config.upOffset, config.timeMove).SetTarget(bottleTransform);
         }
 
@@ -169,22 +167,23 @@ namespace Scenes.GameScene.Bottle
             Bottle targetBottle,
             Color colorToTransfer,
             int countOfColorToTransfer,
-            BottleShaderController shaderController,
             CancellationToken cancellationToken = default)
         {
             try
             {
+                ChooseRotationPointAndDirection(targetBottle.transform.position.x);
+                
                 // 1. Двигаем бутылку и одновременно вращаем перед началом
                 var moveToTarget = bottleTransform
                     .DOMove(targetBottle.transform.position + chosenPouringPoint, config.timeMove)
                     .ToUniTask(cancellationToken: cancellationToken);
 
-                var rotateBefore = RotateBottleBeforePouringAsync(shaderController, cancellationToken);
+                var rotateBefore = RotateBottleBeforePouringAsync(cancellationToken);
 
                 await UniTask.WhenAll(moveToTarget, rotateBefore);
 
                 // 2. Вращение с наливанием
-                await RotateBottleWithPouringAsync(targetBottle, colorToTransfer, countOfColorToTransfer, shaderController, cancellationToken);
+                await RotateBottleWithPouringAsync(targetBottle, colorToTransfer, countOfColorToTransfer, cancellationToken);
                 targetBottle.DecreaseUsagesCount();
 
                 // 3. Возвращаем бутылку и крутим обратно одновременно
@@ -192,7 +191,7 @@ namespace Scenes.GameScene.Bottle
                     .DOMove(defaultPosition, config.timeMove)
                     .ToUniTask(cancellationToken: cancellationToken);
 
-                var rotateBack = RotateBottleBackAsync(shaderController, cancellationToken);
+                var rotateBack = RotateBottleBackAsync(cancellationToken);
 
                 await UniTask.WhenAll(moveBack, rotateBack);
             }
