@@ -469,7 +469,7 @@ MonoBehaviour:
   bottle: {fileID: 8723869106329755495}
   view: {fileID: 5622288443558678666}
   shaderConfig: {fileID: 11400000, guid: f62169b382a29a74981275663d0861e4, type: 2}
-  pouringAnimationConfig: {fileID: 11400000, guid: 049f2bcb9f211d84ba23f29f306fe5ef, type: 2}
+  animationConfig: {fileID: 11400000, guid: 8aeb0513bd0a2734dbe2e597301f6320, type: 2}
 --- !u!1 &4570087112361650040
 GameObject:
   m_ObjectHideFlags: 0

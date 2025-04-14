@@ -1,8 +1,7 @@
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using Core.InputSystem;
-    using DG.Tweening;
+    using Cysharp.Threading.Tasks;
     using UnityEngine;
     using Zenject;
 
@@ -50,68 +49,37 @@
             {
                 shaderController.HideTopColor(count);
             }
-
-            private int activeCoroutines;
-            private bool sequenceCompleted;
             
-            public void PouringColorsBetweenBottles(Bottle targetBottle, Action onComplete = null)
+            public async void PouringColorsBetweenBottles(Bottle targetBottle, Action onComplete = null)
             {
                 var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(GetNumberOfTopColorLayers());
                 var colorToTransfer = GetTopColor();
                 targetBottle.AddColor(countOfColorToTransfer, colorToTransfer);
-                
+    
                 targetBottle.IncreaseUsagesCount();
                 bottleAnimationController.ChooseRotationPointAndDirection(targetBottle.transform.position.x);
                 InUse = true;
-                sequenceCompleted = false;
-                activeCoroutines = 0;
                 SetSortingOrderUp();
-                
-                bottleAnimationController.PouringAnimation(targetBottle, colorToTransfer, countOfColorToTransfer,
-                    shaderController, () =>
-                    {
-                        sequenceCompleted = true; 
-                        CheckCompletion();
-                        onComplete?.Invoke();
-                    });
-                
-                /*
-                var timeMove = bottleAnimationController.GetMoveTime();
-                var timeRotation = bottleAnimationController.GetRotationTime();
-                var pouringColors = DOTween.Sequence().SetTarget(gameObject);
-                
-                /*
-                pouringColors.Append(transform.DOMove(targetBottle.transform.position + chosenPouringPoint, timeMove))
-                    .InsertCallback(0.0f,
-                        () => StartCoroutine(bottleAnimationController.RotateBottleBeforePouring(shaderController)))
-                    .InsertCallback(timeMove + 0.01f,
-                        () => StartCoroutine(bottleAnimationController.RotateBottleWithPouring(targetBottle, 
-                            GetTopColor(), countOfColorToTransfer, shaderController)))
-                    .Insert(timeMove + timeRotation + 0.02f, transform.DOMove(defaultPosition, timeMove))
-                    .InsertCallback(timeMove + timeRotation + 0.02f,
-                        () => StartCoroutine(TrackCoroutine(bottleAnimationController.RotateBottleBack(shaderController))))
-                    .OnComplete(() => 
-                    { 
-                        sequenceCompleted = true; 
-                        CheckCompletion();
-                        onComplete?.Invoke();
-                    });
-                    */
-            }
 
-            private IEnumerator TrackCoroutine(IEnumerator coroutine)
-            {
-                activeCoroutines++;
-                yield return StartCoroutine(coroutine);
-                activeCoroutines--;
-                CheckCompletion();
-            }
+                var ct = this.GetCancellationTokenOnDestroy();
 
-            private void CheckCompletion()
-            {
-                if (activeCoroutines != 0 || !sequenceCompleted) return;
-                InUse = false;
-                SetSortingOrderDown();
+                try
+                {
+                    await bottleAnimationController.PouringAnimationAsync(
+                        targetBottle,
+                        colorToTransfer,
+                        countOfColorToTransfer,
+                        shaderController,
+                        ct
+                    );
+                    InUse = false;
+                    SetSortingOrderDown();
+                    onComplete?.Invoke();
+                }
+                catch (OperationCanceledException)
+                {
+                    InUse = false;
+                }
             }
 
             private void SetSortingOrderDown()
@@ -167,6 +135,9 @@
             }
 
             public void GoToStartPosition() => bottleAnimationController.GoToStartPosition();
-            public void GoUp() => bottleAnimationController.GoUp();
+            public void GoUp()
+            {
+                bottleAnimationController.GoUp();
+            }
         }
     }

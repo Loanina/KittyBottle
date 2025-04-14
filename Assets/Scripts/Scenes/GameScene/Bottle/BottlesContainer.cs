@@ -17,7 +17,6 @@ namespace Scenes.GameScene.Bottle
         [Inject]
         public BottlesContainer(
             LayoutSettings layoutSettings,
-            Transform parent,
             BottleFactory bottleFactory)
         {
             this.layoutSettings = layoutSettings;
