@@ -1,200 +1,172 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Core.InputSystem;
-using DG.Tweening;
-using UnityEngine;
-using Zenject;
-using Debug = UnityEngine.Debug;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using Core.InputSystem;
+    using DG.Tweening;
+    using UnityEngine;
+    using Zenject;
 
-namespace Scenes.GameScene.Bottle
-{
-    public class Bottle : MonoBehaviour, IClickable
+    namespace Scenes.GameScene.Bottle
     {
-        private BottleShaderController shaderController;
-        private PouringAnimationController pouringAnimationController;
-        private BottleView view;
+        public class Bottle : MonoBehaviour, IClickable
+        {
+            private BottleShaderController shaderController;
+            private BottleAnimationController bottleAnimationController;
+            private BottleView view;
+            public bool InUse { get; private set; }
+            public int UsesCount { get; private set; }
+            public event Action<Bottle> OnClicked;
 
-        [Inject]
-        public void Construct(BottleShaderController shaderController, PouringAnimationController pouringAnimationController, BottleView view)
-        {
-            this.shaderController = shaderController;
-            this.pouringAnimationController = pouringAnimationController;
-            this.view = view;
-            Debug.Log("Все проинжектировалось");
-        }
-        
-        private Vector3 chosenPouringPoint;
-        private Vector3 defaultPosition;
-        public bool InUse { get; private set; }
-        public int UsesCount { get; private set; }
-        public event Action<Bottle> OnClicked;
-
-        public void Initialize(List<Color> bottleColors)
-        {
-            shaderController.Initialize(bottleColors);
-            SetDefaultPosition();
-        }
-
-        private void SetDefaultPosition()
-        {
-            defaultPosition = transform.position;
-            Debug.Log($"def position in init {defaultPosition}");
-        }
-        
-        public void OnClick()
-        {
-            OnClicked?.Invoke(this);
-        }
-    
-        public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
-        {
-            if (transform.position.x > positionOfTargetBottleX && transform.localPosition.x <= 0.31) 
+            [Inject]
+            public void Construct(BottleShaderController shaderController, BottleAnimationController bottleAnimationController, BottleView view)
             {
-                pouringAnimationController.SetRotationPoint(view.leftRotationPoint);
-                chosenPouringPoint = view.rightPouringPoint.localPosition;
-                pouringAnimationController.SetDirectionMultiplier(-1.0f);
+                this.shaderController = shaderController;
+                this.bottleAnimationController = bottleAnimationController;
+                this.view = view;
             }
-            else if (transform.localPosition.x >= -0.31)
+            
+            public void Initialize(List<Color> bottleColors)
             {
-                pouringAnimationController.SetRotationPoint(view.rightRotationPoint);
-                chosenPouringPoint = view.leftPouringPoint.localPosition;
-                pouringAnimationController.SetDirectionMultiplier(1.0f);
+                shaderController.Initialize(bottleColors);
+                bottleAnimationController.SetDefaultPosition();
             }
-            else
+            
+            public void OnClick()
             {
-                pouringAnimationController.SetRotationPoint(view.leftRotationPoint);
-                chosenPouringPoint = view.rightPouringPoint.localPosition;
-                pouringAnimationController.SetDirectionMultiplier(-1.0f);
+                OnClicked?.Invoke(this);
             }
-        }
-        
-        public void GoUp()
-        {
-            transform.DOMoveY(defaultPosition.y + 0.20f, pouringAnimationController.GetMoveTime()).SetTarget(gameObject);
-        }
-
-        public void GoToStartPosition()
-        {
-            transform.DOMove(defaultPosition, pouringAnimationController.GetMoveTime()).SetTarget(gameObject);
-        }
-        
-        public void FillUp(float fillUpToAdd)
-        {
-            shaderController.FillUp(fillUpToAdd);
-        }
-
-        public void AddColor(int count, Color color)
-        {
-            shaderController.AddColor(count, color);
-        }
-
-        public void RemoveTopColor(int count)
-        {
-            shaderController.HideTopColor(count);
-        }
-
-        private int activeCoroutines;
-        private bool sequenceCompleted;
-        
-        public void PouringColorsBetweenBottles(Bottle targetBottle, Action onComplete = null)
-        {
-            var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(GetNumberOfTopColorLayers());
-            targetBottle.AddColor(countOfColorToTransfer, GetTopColor());
             
-            targetBottle.IncreaseUsagesCount();
-            ChooseRotationPointAndDirection(targetBottle.transform.position.x);
-            InUse = true;
-            sequenceCompleted = false;
-            activeCoroutines = 0;
-            SetSortingOrderUp();
+            public void FillUp(float fillUpToAdd)
+            {
+                shaderController.FillUp(fillUpToAdd);
+            }
+
+            public void AddColor(int count, Color color)
+            {
+                shaderController.AddColor(count, color);
+            }
+
+            public void RemoveTopColor(int count)
+            {
+                shaderController.HideTopColor(count);
+            }
+
+            private int activeCoroutines;
+            private bool sequenceCompleted;
             
-            var timeMove = pouringAnimationController.GetMoveTime();
-            var timeRotation = pouringAnimationController.GetRotationTime();
-            var pouringColors = DOTween.Sequence().SetTarget(gameObject);
-            
-            pouringColors.Append(transform.DOMove(targetBottle.transform.position + chosenPouringPoint, timeMove))
-                .InsertCallback(0.0f,
-                    () => StartCoroutine(pouringAnimationController.RotateBottleBeforePouring(shaderController)))
-                .InsertCallback(timeMove + 0.01f,
-                    () => StartCoroutine(pouringAnimationController.RotateBottleWithPouring(targetBottle, 
-                        GetTopColor(), countOfColorToTransfer, shaderController)))
-                .Insert(timeMove + timeRotation + 0.02f, transform.DOMove(defaultPosition, timeMove))
-                .InsertCallback(timeMove + timeRotation + 0.02f,
-                    () => StartCoroutine(TrackCoroutine(pouringAnimationController.RotateBottleBack(shaderController))))
-                .OnComplete(() => 
-                { 
-                    sequenceCompleted = true; 
-                    CheckCompletion();
-                    onComplete?.Invoke();
-                });
-        }
+            public void PouringColorsBetweenBottles(Bottle targetBottle, Action onComplete = null)
+            {
+                var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(GetNumberOfTopColorLayers());
+                var colorToTransfer = GetTopColor();
+                targetBottle.AddColor(countOfColorToTransfer, colorToTransfer);
+                
+                targetBottle.IncreaseUsagesCount();
+                bottleAnimationController.ChooseRotationPointAndDirection(targetBottle.transform.position.x);
+                InUse = true;
+                sequenceCompleted = false;
+                activeCoroutines = 0;
+                SetSortingOrderUp();
+                
+                bottleAnimationController.PouringAnimation(targetBottle, colorToTransfer, countOfColorToTransfer,
+                    shaderController, () =>
+                    {
+                        sequenceCompleted = true; 
+                        CheckCompletion();
+                        onComplete?.Invoke();
+                    });
+                
+                /*
+                var timeMove = bottleAnimationController.GetMoveTime();
+                var timeRotation = bottleAnimationController.GetRotationTime();
+                var pouringColors = DOTween.Sequence().SetTarget(gameObject);
+                
+                /*
+                pouringColors.Append(transform.DOMove(targetBottle.transform.position + chosenPouringPoint, timeMove))
+                    .InsertCallback(0.0f,
+                        () => StartCoroutine(bottleAnimationController.RotateBottleBeforePouring(shaderController)))
+                    .InsertCallback(timeMove + 0.01f,
+                        () => StartCoroutine(bottleAnimationController.RotateBottleWithPouring(targetBottle, 
+                            GetTopColor(), countOfColorToTransfer, shaderController)))
+                    .Insert(timeMove + timeRotation + 0.02f, transform.DOMove(defaultPosition, timeMove))
+                    .InsertCallback(timeMove + timeRotation + 0.02f,
+                        () => StartCoroutine(TrackCoroutine(bottleAnimationController.RotateBottleBack(shaderController))))
+                    .OnComplete(() => 
+                    { 
+                        sequenceCompleted = true; 
+                        CheckCompletion();
+                        onComplete?.Invoke();
+                    });
+                    */
+            }
 
-        private IEnumerator TrackCoroutine(IEnumerator coroutine)
-        {
-            activeCoroutines++;
-            yield return StartCoroutine(coroutine);
-            activeCoroutines--;
-            CheckCompletion();
-        }
+            private IEnumerator TrackCoroutine(IEnumerator coroutine)
+            {
+                activeCoroutines++;
+                yield return StartCoroutine(coroutine);
+                activeCoroutines--;
+                CheckCompletion();
+            }
 
-        private void CheckCompletion()
-        {
-            if (activeCoroutines != 0 || !sequenceCompleted) return;
-            InUse = false;
-            SetSortingOrderDown();
-        }
+            private void CheckCompletion()
+            {
+                if (activeCoroutines != 0 || !sequenceCompleted) return;
+                InUse = false;
+                SetSortingOrderDown();
+            }
 
-        private void SetSortingOrderDown()
-        {
-            view.sortingGroup.sortingOrder = 1;
-        }
+            private void SetSortingOrderDown()
+            {
+                view.sortingGroup.sortingOrder = 1;
+            }
 
-        private void SetSortingOrderUp()
-        {
-            view.sortingGroup.sortingOrder = 2;
-        }
+            private void SetSortingOrderUp()
+            {
+                view.sortingGroup.sortingOrder = 2;
+            }
 
-        public bool EnableToFillBottle(Color color)
-        {
-            return shaderController.EnableToFillBottle(color);
-        }
+            public bool EnableToFillBottle(Color color)
+            {
+                return shaderController.EnableToFillBottle(color);
+            }
 
-        public Color GetTopColor()
-        {
-            return shaderController.TopColor;
-        }
+            public Color GetTopColor()
+            {
+                return shaderController.TopColor;
+            }
 
-        public bool IsEmpty()
-        {
-            return shaderController.IsEmpty();
-        }
+            public bool IsEmpty()
+            {
+                return shaderController.IsEmpty();
+            }
 
-        public bool IsFull() => shaderController.IsFull();
+            public bool IsFull() => shaderController.IsFull();
 
-        public int GetNumberOfTopColorLayers()
-        {
-            return shaderController.NumberOfTopColorLayers;
-        }
+            private int GetNumberOfTopColorLayers()
+            {
+                return shaderController.NumberOfTopColorLayers;
+            }
 
-        public int NumberOfColorToTransfer(int countOfColor)
-        {
-            return shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
-        }
+            private int NumberOfColorToTransfer(int countOfColor)
+            {
+                return shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
+            }
 
-        public Stack<Color> GetColors()
-        {
-            return shaderController._bottleColors;
-        }
+            public Stack<Color> GetColors()
+            {
+                return shaderController._bottleColors;
+            }
 
-        public void IncreaseUsagesCount()
-        {
-            UsesCount += 1;
-        }
+            private void IncreaseUsagesCount()
+            {
+                UsesCount += 1;
+            }
 
-        public void DecreaseUsagesCount()
-        {
-            if (UsesCount > 0) UsesCount -= 1;
+            public void DecreaseUsagesCount()
+            {
+                if (UsesCount > 0) UsesCount -= 1;
+            }
+
+            public void GoToStartPosition() => bottleAnimationController.GoToStartPosition();
+            public void GoUp() => bottleAnimationController.GoUp();
         }
     }
-}

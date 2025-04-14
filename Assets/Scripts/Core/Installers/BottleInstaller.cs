@@ -9,7 +9,7 @@ namespace Core.Installers
         [SerializeField] private Bottle bottle;
         [SerializeField] private BottleView view;
         [SerializeField] private BottleShaderConfig shaderConfig;
-        [SerializeField] private PouringAnimationConfig pouringAnimationConfig;
+        [SerializeField] private BottleAnimationConfig animationConfig;
        
         
         public override void InstallBindings()
@@ -17,7 +17,7 @@ namespace Core.Installers
             Container.Bind<BottleView>().FromInstance(view).AsSingle();
             Container.BindInterfacesAndSelfTo<Bottle>().FromInstance(bottle).AsSingle();
             Container.Bind<BottleShaderController>().AsSingle().WithArguments(shaderConfig);
-            Container.Bind<PouringAnimationController>().AsSingle().WithArguments(pouringAnimationConfig);
+            Container.Bind<BottleAnimationController>().AsSingle().WithArguments(animationConfig, transform);
         }
     }
 }

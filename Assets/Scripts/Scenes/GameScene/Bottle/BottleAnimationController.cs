@@ -1,41 +1,43 @@
+using System;
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using Zenject;
 
 namespace Scenes.GameScene.Bottle
 {
-    public class PouringAnimationController
+    public class BottleAnimationController
     {
-        private readonly PouringAnimationConfig config;
+        private readonly BottleAnimationConfig config;
         private readonly BottleView view;
+        private Transform bottleTransform;
+        private Vector3 chosenPouringPoint;
         private Transform chosenRotationPoint;
         private float directionMultiplier = 1.0f;
+        private Vector3 defaultPosition;
 
         [Inject]
-        public PouringAnimationController(PouringAnimationConfig config, BottleView view)
+        public BottleAnimationController(BottleAnimationConfig config, BottleView view, Transform bottleTransform)
         {
             this.config = config;
             this.view = view;
+            this.bottleTransform = bottleTransform;
+        }
+        
+        public void SetDefaultPosition()
+        {
+            defaultPosition = bottleTransform.position;
+            Debug.Log($"def position in init {defaultPosition}");
         }
 
-        public void SetRotationPoint(Transform point)
+        private void SetRotationPoint(Transform point)
         {
             chosenRotationPoint = point;
         }
 
-        public void SetDirectionMultiplier(float value)
+        private void SetDirectionMultiplier(float value)
         {
             directionMultiplier = value;
-        }
-
-        public float GetRotationTime()
-        {
-            return config.timeRotation;
-        }
-
-        public float GetMoveTime()
-        {
-            return config.timeMove;
         }
         
         public IEnumerator RotateBottleBeforePouring(BottleShaderController shaderController)
@@ -140,6 +142,60 @@ namespace Scenes.GameScene.Bottle
                 view.leftColorFlow.enabled = true;
                 view.leftColorFlow.color = color;
             }
+        }
+        
+        public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
+        {
+            if (bottleTransform.position.x > positionOfTargetBottleX && bottleTransform.localPosition.x <= config.leftEdgeThreshold) 
+            {
+                SetRotationPoint(view.leftRotationPoint);
+                chosenPouringPoint = view.rightPouringPoint.localPosition;
+                SetDirectionMultiplier(-1.0f);    
+            }
+            else if (bottleTransform.localPosition.x >= -1 * config.leftEdgeThreshold)
+            {
+                SetRotationPoint(view.rightRotationPoint);
+                chosenPouringPoint = view.leftPouringPoint.localPosition;
+                SetDirectionMultiplier(1.0f);
+            }
+            else
+            {
+                SetRotationPoint(view.leftRotationPoint);
+                chosenPouringPoint = view.rightPouringPoint.localPosition;
+                SetDirectionMultiplier(-1.0f);
+            }
+        }
+        
+        public void GoUp()
+        {
+            bottleTransform.DOMoveY(defaultPosition.y + config.upOffset, config.timeMove).SetTarget(bottleTransform);
+        }
+
+        public void GoToStartPosition()
+        {
+            bottleTransform.DOMove(defaultPosition, config.timeMove).SetTarget(bottleTransform);
+        }
+
+        public void PouringAnimation(Bottle targetBottle,  Color colorToTransfer, 
+            int countOfColorToTransfer , BottleShaderController shaderController , Action onComplete = null)
+        {
+            var pouringColors = DOTween.Sequence().SetTarget(bottleTransform);
+            /*
+            pouringColors.Append(bottleTransform.DOMove(targetBottle.transform.position + chosenPouringPoint, config.timeMove))
+                .InsertCallback(0.0f,
+                    () => StartCoroutine(RotateBottleBeforePouring(shaderController)))
+                .InsertCallback(config.timeMove + 0.01f,
+                    () => StartCoroutine(RotateBottleWithPouring(targetBottle, 
+                        colorToTransfer, countOfColorToTransfer, shaderController)))
+                .Insert(config.timeMove + config.timeRotation + 0.02f, bottleTransform.DOMove(defaultPosition, config.timeMove))
+                .InsertCallback(config.timeMove + config.timeRotation + 0.02f,
+                    () => StartCoroutine(TrackCoroutine(RotateBottleBack(shaderController))))
+                .OnComplete(() => 
+                {
+                    onComplete?.Invoke();
+                });
+                
+                */
         }
     }
 }
