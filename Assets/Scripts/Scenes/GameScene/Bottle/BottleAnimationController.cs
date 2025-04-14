@@ -13,9 +13,9 @@ namespace Scenes.GameScene.Bottle
         private readonly BottleView view;
         private readonly Transform bottleTransform;
         private Vector3 chosenPouringPoint;
-        private Transform chosenRotationPoint;
-        private float directionMultiplier = 1.0f;
+        private Vector3 chosenRotationPoint;
         private Vector3 defaultPosition;
+        private float directionMultiplier = 1.0f;
 
         [Inject]
         public BottleAnimationController(BottleAnimationConfig config, BottleView view, Transform bottleTransform)
@@ -30,16 +30,9 @@ namespace Scenes.GameScene.Bottle
             defaultPosition = bottleTransform.position;
             Debug.Log($"def position in init {defaultPosition}");
         }
-
-        private void SetRotationPoint(Transform point)
-        {
-            chosenRotationPoint = point;
-        }
-
-        private void SetDirectionMultiplier(float value)
-        {
-            directionMultiplier = value;
-        }
+        private void SetRotationPoint(Vector3 point) => chosenRotationPoint = point;
+        private void SetDirectionMultiplier(float value) => directionMultiplier = value;
+        
 
         private async UniTask RotateBottleBeforePouringAsync(BottleShaderController shaderController, CancellationToken cancellationToken)
         {
@@ -54,7 +47,7 @@ namespace Scenes.GameScene.Bottle
 
                 var lerpValue = time / config.timeMove;
                 angleValue = Mathf.Lerp(0.0f, finishAngle, lerpValue);
-                view.glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
+                view.glassTransform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue);
 
                 time += Time.deltaTime;
@@ -76,7 +69,7 @@ namespace Scenes.GameScene.Bottle
             firstAngleValue *= directionMultiplier;
             var lastAngleValue = firstAngleValue;
 
-            DoColorFlow(directionMultiplier > 0.0f, colorToTransfer);
+            view.SetColorFlow(directionMultiplier > 0.0f, true, colorToTransfer);
 
             while (time < config.timeRotation)
             {
@@ -84,7 +77,7 @@ namespace Scenes.GameScene.Bottle
 
                 var lerpValue = time / config.timeRotation;
                 angleValue = Mathf.Lerp(firstAngleValue, directionMultiplier * config.rotationValues[rotationIndex], lerpValue);
-                view.glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
+                view.glassTransform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShader(angleValue, lastAngleValue, targetBottle);
                 //time += Time.deltaTime * rotationSpeedMultiplier.Evaluate(angleValue);
                 time += Time.deltaTime;
@@ -93,7 +86,7 @@ namespace Scenes.GameScene.Bottle
                 await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, cancellationToken);
             }
 
-            RemoveFlow(directionMultiplier > 0.0f);
+            view.SetColorFlow(directionMultiplier > 0.0f, false);
 
             angleValue = directionMultiplier * config.rotationValues[rotationIndex];
             shaderController.RotateShaderComplete(angleValue, countOfColorToTransfer);
@@ -115,7 +108,7 @@ namespace Scenes.GameScene.Bottle
 
                 var lerpValue = time / config.timeMove;
                 angleValue = Mathf.Lerp(firstAngleValue, 0.0f, lerpValue);
-                view.glassTransform.RotateAround(chosenRotationPoint.position, Vector3.forward, lastAngleValue - angleValue);
+                view.glassTransform.RotateAround(chosenRotationPoint, Vector3.forward, lastAngleValue - angleValue);
                 shaderController.RotateShaderBack(angleValue);
 
                 time += Time.deltaTime;
@@ -138,44 +131,24 @@ namespace Scenes.GameScene.Bottle
             angle = Mathf.Abs(angle);
             return angle;
         }
-
-        private void RemoveFlow(bool isRightPouringDirection)
-        {
-            if (isRightPouringDirection) view.rightColorFlow.enabled = false;
-            else view.leftColorFlow.enabled = false;
-        }
-
-        private void DoColorFlow(bool isRightPouringDirection, Color color)
-        {
-            if (isRightPouringDirection)
-            {
-                view.rightColorFlow.enabled = true;
-                view.rightColorFlow.color = color;
-            }
-            else
-            {
-                view.leftColorFlow.enabled = true;
-                view.leftColorFlow.color = color;
-            }
-        }
         
         public void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
         {
             if (bottleTransform.position.x > positionOfTargetBottleX && bottleTransform.localPosition.x <= config.leftEdgeThreshold) 
             {
-                SetRotationPoint(view.leftRotationPoint);
+                SetRotationPoint(view.leftRotationPoint.position);
                 chosenPouringPoint = view.rightPouringPoint.localPosition;
                 SetDirectionMultiplier(-1.0f);    
             }
             else if (bottleTransform.localPosition.x >= -1 * config.leftEdgeThreshold)
             {
-                SetRotationPoint(view.rightRotationPoint);
+                SetRotationPoint(view.rightRotationPoint.position);
                 chosenPouringPoint = view.leftPouringPoint.localPosition;
                 SetDirectionMultiplier(1.0f);
             }
             else
             {
-                SetRotationPoint(view.leftRotationPoint);
+                SetRotationPoint(view.leftRotationPoint.position);
                 chosenPouringPoint = view.rightPouringPoint.localPosition;
                 SetDirectionMultiplier(-1.0f);
             }

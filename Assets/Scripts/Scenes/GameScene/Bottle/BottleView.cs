@@ -15,5 +15,25 @@ namespace Scenes.GameScene.Bottle
         [SerializeField] public Transform leftPouringPoint;
         [SerializeField] public Transform rightRotationPoint;
         [SerializeField] public Transform leftRotationPoint;
+
+        public void SetColorFlow(bool isRightDirection, bool isActive, Color color)
+        {
+            if (isRightDirection)
+            {
+                rightColorFlow.enabled = isActive;
+                rightColorFlow.color = color;
+            }
+            else
+            {
+                leftColorFlow.enabled = isActive;
+                leftColorFlow.color = color;
+            }
+        }
+        
+        public void SetColorFlow(bool isRightDirection, bool isActive)
+        {
+            if (isRightDirection) rightColorFlow.enabled = isActive;
+            else leftColorFlow.enabled = isActive;
+        }
     }
 }
