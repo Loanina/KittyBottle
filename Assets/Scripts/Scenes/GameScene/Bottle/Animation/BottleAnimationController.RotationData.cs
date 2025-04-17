@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Scenes.GameScene.Bottle
+namespace Scenes.GameScene.Bottle.Animation
 {
     public partial class BottleAnimationController
     {

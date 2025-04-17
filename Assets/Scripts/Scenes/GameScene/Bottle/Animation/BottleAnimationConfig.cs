@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Scenes.GameScene.Bottle
+namespace Scenes.GameScene.Bottle.Animation
 {
     [CreateAssetMenu(fileName = "BottleAnimationConfig", menuName = "Game/Animations/Bottle Animation Config")]
     public class BottleAnimationConfig : ScriptableObject

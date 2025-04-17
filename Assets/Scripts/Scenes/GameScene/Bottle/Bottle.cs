@@ -2,6 +2,7 @@
     using System.Collections.Generic;
     using Core.InputSystem;
     using Cysharp.Threading.Tasks;
+    using Scenes.GameScene.Bottle.Animation;
     using UnityEngine;
     using Zenject;
 

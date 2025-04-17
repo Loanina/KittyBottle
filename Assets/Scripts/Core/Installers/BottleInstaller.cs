@@ -1,4 +1,5 @@
 ﻿using Scenes.GameScene.Bottle;
+using Scenes.GameScene.Bottle.Animation;
 using UnityEngine;
 using Zenject;
 
