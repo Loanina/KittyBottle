@@ -1,5 +1,6 @@
 ﻿using Scenes.GameScene.Bottle;
 using Scenes.GameScene.Bottle.Animation;
+using Scenes.GameScene.Bottle.Shader;
 using UnityEngine;
 using Zenject;
 

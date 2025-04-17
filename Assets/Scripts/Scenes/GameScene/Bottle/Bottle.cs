@@ -3,6 +3,7 @@
     using Core.InputSystem;
     using Cysharp.Threading.Tasks;
     using Scenes.GameScene.Bottle.Animation;
+    using Scenes.GameScene.Bottle.Shader;
     using UnityEngine;
     using Zenject;
 
@@ -92,7 +93,7 @@
 
             private int NumberOfColorToTransfer(int countOfColor) => shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
 
-            public Stack<Color> GetColors() => shaderController._bottleColors;
+            public Stack<Color> GetColors() => shaderController.BottleColors;
 
             private void IncreaseUsagesCount() => UsesCount += 1;
 

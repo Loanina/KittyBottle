@@ -4,34 +4,35 @@ using System.Linq;
 using UnityEngine;
 using Zenject;
 
-namespace Scenes.GameScene.Bottle
+namespace Scenes.GameScene.Bottle.Shader
 {
     public class BottleShaderController
     {
         private readonly BottleShaderConfig config;
-        private readonly SpriteRenderer mask;
+        private readonly Material material;
         
         [Inject]
         public BottleShaderController(BottleShaderConfig config, BottleView view)
         {
             this.config = config;
-            mask = view.bottleMaskSR;
+            material = view.bottleMaskSR.material;
         }
         
-        public Stack<Color> _bottleColors { get; private set; }
+        public Stack<Color> BottleColors { get; private set; }
         public Color TopColor { get; private set; }
-        public int NumberOfTopColorLayers { get; private set; } = 1;
-        private static readonly int ScaleAndRotationMultiplyProperty = Shader.PropertyToID("_ScaleAndRotationMultiplyProperty");
-        private static readonly int FillAmount = Shader.PropertyToID("_FillAmount");
+        public int NumberOfTopColorLayers { get; private set; }
+        
+        private static readonly int ScaleAndRotationMultiplyProperty = UnityEngine.Shader.PropertyToID("_ScaleAndRotationMultiplyProperty");
+        private static readonly int FillAmount = UnityEngine.Shader.PropertyToID("_FillAmount");
         
         private void UpdateTopColorValues()
         {
-            if (_bottleColors.Count == 0)
+            if (BottleColors.Count == 0)
                 NumberOfTopColorLayers = 0;
             else
             {
                 NumberOfTopColorLayers = 1;
-                var bottleColorsCopy = new Stack<Color>(new Stack<Color>(_bottleColors));
+                var bottleColorsCopy = new Stack<Color>(new Stack<Color>(BottleColors));
                 TopColor = bottleColorsCopy.Pop();
 
                 while (bottleColorsCopy.TryPop(out var result) && result.Equals(TopColor))
@@ -45,11 +46,11 @@ namespace Scenes.GameScene.Bottle
         {
             try
             {
-                if (_bottleColors.Count == 0) return;
-                var bottleColorsCopy = new Stack<Color>(new Stack<Color>(_bottleColors));
+                if (BottleColors.Count == 0) return;
+                var bottleColorsCopy = new Stack<Color>(new Stack<Color>(BottleColors));
                 for (var i = bottleColorsCopy.Count; i > 0; i--)
                 {
-                    mask.material.SetColor("_Color" + i, bottleColorsCopy.Pop());
+                    material.SetColor("_Color" + i, bottleColorsCopy.Pop());
                 }
             }
             catch (Exception e)
@@ -60,50 +61,44 @@ namespace Scenes.GameScene.Bottle
 
         public void RotateShaderComplete(float angleValue, int countOfColorToTransfer)
         {
-            mask.material.SetFloat(ScaleAndRotationMultiplyProperty, config.scaleAndRotationMultiplierCurve.Evaluate(angleValue));
-            mask.material.SetFloat(FillAmount,config.fillAmountCurve.Evaluate(angleValue));
+            material.SetFloat(ScaleAndRotationMultiplyProperty, config.scaleAndRotationMultiplierCurve.Evaluate(angleValue));
+            material.SetFloat(FillAmount,config.fillAmountCurve.Evaluate(angleValue));
             for (var i = countOfColorToTransfer; i > 0; i--)
             {
-                _bottleColors.Pop();
+                BottleColors.Pop();
             }
             UpdateTopColorValues();
         }
 
         public void HideTopColor(int count)
         {
-            mask.material.SetFloat(FillAmount, config.fillAmountValues[_bottleColors.Count() - count]);
+            material.SetFloat(FillAmount, config.fillAmountValues[BottleColors.Count() - count]);
             for (var i = count; i > 0; i--)
             {
-                _bottleColors.Pop();
+                BottleColors.Pop();
             }
             UpdateTopColorValues();
         }
 
         public void RotateShader(float angleValue, float lastAngleValue, Bottle targetBottle)
         {
-            mask.material.SetFloat(ScaleAndRotationMultiplyProperty, config.scaleAndRotationMultiplierCurve.Evaluate(angleValue));
+            material.SetFloat(ScaleAndRotationMultiplyProperty, config.scaleAndRotationMultiplierCurve.Evaluate(angleValue));
             
-            if (config.fillAmountValues[_bottleColors.Count] < config.fillAmountCurve.Evaluate(angleValue)) return;
-            mask.material.SetFloat(FillAmount,config.fillAmountCurve.Evaluate(angleValue));
+            if (config.fillAmountValues[BottleColors.Count] < config.fillAmountCurve.Evaluate(angleValue)) return;
+            material.SetFloat(FillAmount,config.fillAmountCurve.Evaluate(angleValue));
             targetBottle.FillUp(config.fillAmountCurve.Evaluate(lastAngleValue) -
                                 config.fillAmountCurve.Evaluate(angleValue));
         }
 
         public void RotateShader(float angleValue)
         {
-            mask.material.SetFloat(ScaleAndRotationMultiplyProperty, config.scaleAndRotationMultiplierCurve.Evaluate(angleValue));
-        }
-
-        public void RotateShaderBack(float angleValue)
-        {
-            mask.material.SetFloat(ScaleAndRotationMultiplyProperty,
-                config.scaleAndRotationMultiplierCurve.Evaluate(angleValue));
+            material.SetFloat(ScaleAndRotationMultiplyProperty, config.scaleAndRotationMultiplierCurve.Evaluate(angleValue));
         }
         
         public void Initialize(List<Color> bottleColors)
         {
-            _bottleColors = new Stack<Color>(bottleColors);
-            mask.material.SetFloat(FillAmount, config.fillAmountValues[_bottleColors.Count]);
+            BottleColors = new Stack<Color>(bottleColors);
+            material.SetFloat(FillAmount, config.fillAmountValues[BottleColors.Count]);
             UpdateColorsOnShader();
             UpdateTopColorValues();
         }
@@ -112,7 +107,7 @@ namespace Scenes.GameScene.Bottle
         {
             for (var i = count; i > 0; i--)
             {
-                _bottleColors.Push(color);
+                BottleColors.Push(color);
             }
             UpdateColorsOnShader();
             UpdateTopColorValues();
@@ -120,33 +115,33 @@ namespace Scenes.GameScene.Bottle
 
         public bool EnableToFillBottle(Color color)
         {
-            return _bottleColors.Count==0 || (color.Equals(TopColor) && config.maxColorsInBottle > _bottleColors.Count);
+            return BottleColors.Count==0 || (color.Equals(TopColor) && config.maxColorsInBottle > BottleColors.Count);
         }
 
         public int CalculateNumberOfColorsToTransfer(int countOfColor)
         {
-            return  Mathf.Min(countOfColor, config.maxColorsInBottle - _bottleColors.Count);
+            return  Mathf.Min(countOfColor, config.maxColorsInBottle - BottleColors.Count);
         }
 
         public int CalculateRotationIndexToAnotherBottle(int countOfColorToTransfer)
         {
-            return config.maxColorsInBottle - _bottleColors.Count + countOfColorToTransfer;
+            return config.maxColorsInBottle - BottleColors.Count + countOfColorToTransfer;
         }
 
         public int CalculateStartPouringIndex()
         {
-            return config.maxColorsInBottle - _bottleColors.Count;
+            return config.maxColorsInBottle - BottleColors.Count;
         }
 
         public void FillUp(float fillAmountToAdd)
         {
-            mask.material.SetFloat(FillAmount,
-                mask.material.GetFloat(FillAmount) + fillAmountToAdd);
+            material.SetFloat(FillAmount,
+                material.GetFloat(FillAmount) + fillAmountToAdd);
         }
 
         public bool IsEmpty()
         {
-            return _bottleColors.Count == 0;
+            return BottleColors.Count == 0;
         }
 
         public bool IsFullByOneColor()

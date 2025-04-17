@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Scenes.GameScene.Bottle.Shader;
 using UnityEngine;
 using Zenject;
 
@@ -157,7 +158,7 @@ namespace Scenes.GameScene.Bottle.Animation
                         rotationData.RotationPoint,
                         async (angle, _, _) =>
                         {
-                            shaderController.RotateShaderBack(angle);
+                            shaderController.RotateShader(angle);
                             await UniTask.CompletedTask;
                         },
                         null,
@@ -166,7 +167,7 @@ namespace Scenes.GameScene.Bottle.Animation
                 );
 
                 view.glassTransform.eulerAngles = new Vector3(0, 0, 0);
-                shaderController.RotateShaderBack(0f);
+                shaderController.RotateShader(0f);
             }
             catch (OperationCanceledException)
             {

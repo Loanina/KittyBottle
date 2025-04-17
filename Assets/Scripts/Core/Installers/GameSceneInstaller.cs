@@ -6,6 +6,7 @@ using Scenes.GameScene.Bottle;
 using Scenes.GameScene.Bottle.Moves;
 using Scenes.GameScene.ColorPalette;
 using Scenes.GameScene.Level;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
 
@@ -22,7 +23,7 @@ namespace Core.Installers
         [SerializeField] private LayoutSettings layoutSettings;
         [SerializeField] private Transform bottlesParentTransform;
 
-        [ContextMenu("Clear player data")]
+        [Button("Clear player data")]
         private void ClearPlayerData()
         {
             SaveSystem<PlayerData>.Instance.Clear();
