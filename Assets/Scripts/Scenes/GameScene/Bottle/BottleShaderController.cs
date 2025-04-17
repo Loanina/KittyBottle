@@ -158,5 +158,10 @@ namespace Scenes.GameScene.Bottle
         {
             return _bottleColors.Count == config.maxColorsInBottle;
         }
+
+        public bool IsFullByOneColor()
+        {
+            return NumberOfTopColorLayers == config.maxColorsInBottle;
+        }
     }
 }

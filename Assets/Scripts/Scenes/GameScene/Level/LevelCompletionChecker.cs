@@ -8,7 +8,7 @@ namespace Scenes.GameScene.Level
         {
             foreach (var bottle in bottles)
             {
-                if (!(bottle.IsFull() || bottle.IsEmpty()))
+                if (!(bottle.IsFullByOneColor() | bottle.IsEmpty()))
                     return false;
             }
             return true;

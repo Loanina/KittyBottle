@@ -87,6 +87,8 @@
 
             public bool IsFull() => shaderController.IsFull();
 
+            public bool IsFullByOneColor() => shaderController.IsFullByOneColor();
+
             private int GetNumberOfTopColorLayers() => shaderController.NumberOfTopColorLayers;
 
             private int NumberOfColorToTransfer(int countOfColor) => shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
