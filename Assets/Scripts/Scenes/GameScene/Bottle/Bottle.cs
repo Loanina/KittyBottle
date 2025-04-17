@@ -85,8 +85,6 @@
 
             public bool IsEmpty() => shaderController.IsEmpty();
 
-            public bool IsFull() => shaderController.IsFull();
-
             public bool IsFullByOneColor() => shaderController.IsFullByOneColor();
 
             private int GetNumberOfTopColorLayers() => shaderController.NumberOfTopColorLayers;

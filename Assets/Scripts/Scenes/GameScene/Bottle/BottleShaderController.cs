@@ -138,11 +138,6 @@ namespace Scenes.GameScene.Bottle
             return config.maxColorsInBottle - _bottleColors.Count;
         }
 
-        public int GetCountOfColor()
-        {
-            return _bottleColors.Count;
-        }
-
         public void FillUp(float fillAmountToAdd)
         {
             mask.material.SetFloat(FillAmount,
@@ -152,11 +147,6 @@ namespace Scenes.GameScene.Bottle
         public bool IsEmpty()
         {
             return _bottleColors.Count == 0;
-        }
-
-        public bool IsFull()
-        {
-            return _bottleColors.Count == config.maxColorsInBottle;
         }
 
         public bool IsFullByOneColor()
