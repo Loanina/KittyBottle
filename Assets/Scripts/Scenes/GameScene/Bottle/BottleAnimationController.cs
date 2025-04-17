@@ -131,26 +131,26 @@ namespace Scenes.GameScene.Bottle
             return angle;
         }
 
+        private void SetRightDirection()
+        {
+            chosenRotationPoint = view.rightRotationPoint;
+            chosenPouringPoint = view.leftPouringPoint.localPosition;
+            directionMultiplier = 1.0f;
+        }
+        
+        private void SetLeftDirection()
+        {
+            chosenRotationPoint = view.leftRotationPoint;
+            chosenPouringPoint = view.rightPouringPoint.localPosition;
+            directionMultiplier = -1.0f;
+        }
+        
         private void ChooseRotationPointAndDirection(float positionOfTargetBottleX)
         {
-            if (bottleTransform.position.x > positionOfTargetBottleX && bottleTransform.localPosition.x <= config.leftEdgeThreshold) 
-            {
-                chosenRotationPoint = view.leftRotationPoint;
-                chosenPouringPoint = view.rightPouringPoint.localPosition;
-                directionMultiplier = -1.0f;    
-            }
-            else if (bottleTransform.localPosition.x >= -1 * config.leftEdgeThreshold)
-            {
-                chosenRotationPoint = view.rightRotationPoint;
-                chosenPouringPoint = view.leftPouringPoint.localPosition;
-                directionMultiplier = 1.0f;
-            }
-            else
-            {
-                chosenRotationPoint = view.leftRotationPoint;
-                chosenPouringPoint = view.rightPouringPoint.localPosition;
-                directionMultiplier = -1.0f;
-            }
+            if (positionOfTargetBottleX >= config.edgeThreshold) SetRightDirection();
+            else if (positionOfTargetBottleX <= -1 * config.edgeThreshold) SetLeftDirection();
+            else if (bottleTransform.position.x >= positionOfTargetBottleX) SetLeftDirection();
+            else SetRightDirection();
         }
         
         public void GoUp()

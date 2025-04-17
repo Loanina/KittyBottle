@@ -10,7 +10,7 @@ namespace Scenes.GameScene.Bottle
         [Range(0.05f, 1f)] public float upOffset = 0.2f;
 
         [Header("Positions")]
-        [Range(0f, 1f)] public float leftEdgeThreshold = 0.31f;
+        [Range(0f, 1f)] public float edgeThreshold = 0.31f;
         
         [Header("Pouring")]
         public float[] rotationValues = {33.0f, 67.5f, 78.75f, 85.6f, 90.0f};
