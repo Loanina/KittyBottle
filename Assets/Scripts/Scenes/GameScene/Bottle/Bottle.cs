@@ -57,9 +57,9 @@
                 targetBottle.AddColor(countOfColorToTransfer, colorToTransfer);
                 targetBottle.IncreaseUsagesCount();
                 InUse = true;
-                SetSortingOrderUp();
+                view.SetSortingOrder(true);
 
-                var ct = this.GetCancellationTokenOnDestroy();
+                var cancellationTokenOnDestroy = this.GetCancellationTokenOnDestroy();
 
                 try
                 {
@@ -67,10 +67,10 @@
                         targetBottle,
                         colorToTransfer,
                         countOfColorToTransfer,
-                        ct
+                        cancellationTokenOnDestroy
                     );
                     InUse = false;
-                    SetSortingOrderDown();
+                    view.SetSortingOrder(false);
                     onComplete?.Invoke();
                 }
                 catch (OperationCanceledException)
@@ -79,52 +79,21 @@
                 }
             }
 
-            private void SetSortingOrderDown()
-            {
-                view.sortingGroup.sortingOrder = 1;
-            }
+            public bool EnableToFillBottle(Color color) => shaderController.EnableToFillBottle(color);
 
-            private void SetSortingOrderUp()
-            {
-                view.sortingGroup.sortingOrder = 2;
-            }
+            public Color GetTopColor() => shaderController.TopColor;
 
-            public bool EnableToFillBottle(Color color)
-            {
-                return shaderController.EnableToFillBottle(color);
-            }
-
-            public Color GetTopColor()
-            {
-                return shaderController.TopColor;
-            }
-
-            public bool IsEmpty()
-            {
-                return shaderController.IsEmpty();
-            }
+            public bool IsEmpty() => shaderController.IsEmpty();
 
             public bool IsFull() => shaderController.IsFull();
 
-            private int GetNumberOfTopColorLayers()
-            {
-                return shaderController.NumberOfTopColorLayers;
-            }
+            private int GetNumberOfTopColorLayers() => shaderController.NumberOfTopColorLayers;
 
-            private int NumberOfColorToTransfer(int countOfColor)
-            {
-                return shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
-            }
+            private int NumberOfColorToTransfer(int countOfColor) => shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
 
-            public Stack<Color> GetColors()
-            {
-                return shaderController._bottleColors;
-            }
+            public Stack<Color> GetColors() => shaderController._bottleColors;
 
-            private void IncreaseUsagesCount()
-            {
-                UsesCount += 1;
-            }
+            private void IncreaseUsagesCount() => UsesCount += 1;
 
             public void DecreaseUsagesCount()
             {
@@ -132,9 +101,6 @@
             }
 
             public void GoToStartPosition() => bottleAnimationController.GoToStartPosition();
-            public void GoUp()
-            {
-                bottleAnimationController.GoUp();
-            }
+            public void GoUp() => bottleAnimationController.GoUp();
         }
     }
