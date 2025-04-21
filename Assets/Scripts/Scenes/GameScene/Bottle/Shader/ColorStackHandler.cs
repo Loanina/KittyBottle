@@ -52,12 +52,17 @@ namespace Scenes.GameScene.Bottle.Shader
                 return;
             }
 
-            var copy = new Stack<Color>(new Stack<Color>(Colors)); //Поменять
-            TopColor = copy.Pop();
+            var colorsCopy = Colors.ToArray();
+            TopColor = colorsCopy[0];
             TopColorCount = 1;
 
-            while (copy.TryPop(out var c) && c.Equals(TopColor))
+            for (int i = 1; i < colorsCopy.Length; i++)
+            {
+                if (!colorsCopy[i].Equals(TopColor))
+                    break;
+
                 TopColorCount++;
+            }
         }
 
         public int EmptySpace()
