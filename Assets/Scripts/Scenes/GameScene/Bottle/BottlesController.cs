@@ -93,7 +93,7 @@ namespace Scenes.GameScene.Bottle
         private bool CanTransferColor()
         {
             var isFirstBottleEmpty = firstBottle.IsEmpty();
-            var canFillSecondBottle = secondBottle.EnableToFillBottle(firstBottle.GetTopColor());
+            var canFillSecondBottle = secondBottle.EnableToFill(firstBottle.GetTopColor());
             
             Debug.Log($"First bottle empty: {isFirstBottleEmpty}, Can fill second: {canFillSecondBottle}");
             return !isFirstBottleEmpty && canFillSecondBottle;
@@ -132,7 +132,7 @@ namespace Scenes.GameScene.Bottle
         {
             var bottleFrom = bottlesContainer.GetBottle(from);
             var bottleTo = bottlesContainer.GetBottle(to);
-            bottleFrom.AddColor(countOfColorToTransfer, bottleTo.GetTopColor());
+            bottleFrom.AddColor(bottleTo.GetTopColor(), countOfColorToTransfer);
             bottleTo.RemoveTopColor(countOfColorToTransfer);
         }
     }

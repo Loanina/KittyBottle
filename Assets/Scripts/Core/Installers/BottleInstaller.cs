@@ -18,7 +18,9 @@ namespace Core.Installers
         {
             Container.Bind<BottleView>().FromInstance(view).AsSingle();
             Container.BindInterfacesAndSelfTo<Bottle>().FromInstance(bottle).AsSingle();
-            Container.Bind<BottleShaderController>().AsSingle().WithArguments(shaderConfig);
+            Container.Bind<ShaderUpdater>().AsSingle().WithArguments(shaderConfig, view.bottleMaskSR.material);
+            Container.Bind<ColorStackHandler>().AsSingle().WithArguments(shaderConfig.maxColorsInBottle);
+            Container.Bind<BottleShaderController>().AsSingle();
             Container.Bind<BottleAnimationController>().AsSingle().WithArguments(animationConfig, transform);
         }
     }

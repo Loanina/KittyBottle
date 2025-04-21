@@ -110,7 +110,7 @@ namespace Scenes.GameScene.Bottle.Animation
                     rotationData.RotationPoint,
                     async (angle, _, _) =>
                     {
-                        shaderController.RotateShader(angle);
+                        shaderController.Rotate(angle);
                         await UniTask.CompletedTask;
                     },
                     null,
@@ -120,7 +120,7 @@ namespace Scenes.GameScene.Bottle.Animation
                 await UniTask.WhenAll(moveToTarget, rotateBefore);
 
                 // Pouring rotation
-                var rotationIndex = shaderController.CalculateRotationIndexToAnotherBottle(countOfColorToTransfer);
+                var rotationIndex = shaderController.CalculateRotationIndex(countOfColorToTransfer);
                 var fromAngle = CorrelatedEulerAngle(view.glassTransform.eulerAngles.z) * (rotationData.IsClockwise ? 1f : -1f);
                 var toAngle = config.rotationValues[rotationIndex] * (rotationData.IsClockwise ? 1f : -1f);
 
@@ -133,7 +133,7 @@ namespace Scenes.GameScene.Bottle.Animation
                     rotationData.RotationPoint,
                     async (angle, lastAngle, target) =>
                     {
-                        shaderController.RotateShader(angle, lastAngle, target);
+                        shaderController.Rotate(angle, lastAngle, target);
                         await UniTask.CompletedTask;
                     },
                     targetBottle,
@@ -141,7 +141,7 @@ namespace Scenes.GameScene.Bottle.Animation
                 );
 
                 view.SetColorFlow(rotationData.IsClockwise, false);
-                shaderController.RotateShaderComplete(toAngle, countOfColorToTransfer);
+                shaderController.RotateComplete(toAngle, countOfColorToTransfer);
                 targetBottle.DecreaseUsagesCount();
 
                 // Move and rotate back
@@ -158,7 +158,7 @@ namespace Scenes.GameScene.Bottle.Animation
                         rotationData.RotationPoint,
                         async (angle, _, _) =>
                         {
-                            shaderController.RotateShader(angle);
+                            shaderController.Rotate(angle);
                             await UniTask.CompletedTask;
                         },
                         null,
@@ -167,7 +167,7 @@ namespace Scenes.GameScene.Bottle.Animation
                 );
 
                 view.glassTransform.eulerAngles = new Vector3(0, 0, 0);
-                shaderController.RotateShader(0f);
+                shaderController.Rotate(0f);
             }
             catch (OperationCanceledException)
             {

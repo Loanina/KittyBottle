@@ -27,6 +27,7 @@ namespace Core.Installers
         private void ClearPlayerData()
         {
             SaveSystem<PlayerData>.Instance.Clear();
+            Debug.Log("Player data deleted");
         }
 
         public override void InstallBindings()

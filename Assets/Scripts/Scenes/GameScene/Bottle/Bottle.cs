@@ -32,31 +32,19 @@
                 bottleAnimationController.SetDefaultPosition();
             }
             
-            public void OnClick()
-            {
-                OnClicked?.Invoke(this);
-            }
+            public void OnClick() => OnClicked?.Invoke(this);
             
-            public void FillUp(float fillUpToAdd)
-            {
-                shaderController.FillUp(fillUpToAdd);
-            }
+            public void FillUp(float fillUpToAdd) => shaderController.FillUp(fillUpToAdd);
+            
+            public void AddColor(Color color, int count) => shaderController.AddColor(color, count);
 
-            public void AddColor(int count, Color color)
-            {
-                shaderController.AddColor(count, color);
-            }
-
-            public void RemoveTopColor(int count)
-            {
-                shaderController.HideTopColor(count);
-            }
+            public void RemoveTopColor(int count) => shaderController.RemoveTopColor(count);
             
             public async void PouringColorsBetweenBottles(Bottle targetBottle, Action onComplete = null)
             {
-                var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(GetNumberOfTopColorLayers());
+                var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(countOfColor: GetNumberOfTopColorLayers());
                 var colorToTransfer = GetTopColor();
-                targetBottle.AddColor(countOfColorToTransfer, colorToTransfer);
+                targetBottle.AddColor(colorToTransfer, countOfColorToTransfer);
                 targetBottle.IncreaseUsagesCount();
                 InUse = true;
                 view.SetSortingOrder(true);
@@ -81,19 +69,19 @@
                 }
             }
 
-            public bool EnableToFillBottle(Color color) => shaderController.EnableToFillBottle(color);
+            public bool EnableToFill(Color color) => shaderController.CanFill(color);
 
-            public Color GetTopColor() => shaderController.TopColor;
+            public Color GetTopColor() => shaderController.TopColor();
 
             public bool IsEmpty() => shaderController.IsEmpty();
 
             public bool IsFullByOneColor() => shaderController.IsFullByOneColor();
 
-            private int GetNumberOfTopColorLayers() => shaderController.NumberOfTopColorLayers;
+            private int GetNumberOfTopColorLayers() => shaderController.NumberOfTopColor();
 
             private int NumberOfColorToTransfer(int countOfColor) => shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
 
-            public Stack<Color> GetColors() => shaderController.BottleColors;
+            public Stack<Color> GetColors() => shaderController.Colors();
 
             private void IncreaseUsagesCount() => UsesCount += 1;
 
