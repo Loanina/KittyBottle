@@ -48,6 +48,7 @@ namespace Scenes.GameScene.Bottle
         {
             foreach (var bottle in bottles) bottle.OnClicked -= OnBottleClicked;
             ClearSelection();
+            hintManager.ClearMoveHistory();
         }
 
         private void OnBottleClicked(Bottle bottle)

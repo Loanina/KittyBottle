@@ -42,5 +42,7 @@ namespace Core.Hints
             }
             else Debug.Log("There is no last move");
         }
+
+        public void ClearMoveHistory() => moveHistory.ClearMoves();
     }
 }
