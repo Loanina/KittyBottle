@@ -1,9 +1,9 @@
 ﻿using Common.DataManagement;
 using Common.Logging;
 using Core.Hints;
+using Core.Hints.Moves;
 using Core.SavingSystem;
 using Scenes.GameScene.Bottle;
-using Scenes.GameScene.Bottle.Moves;
 using Scenes.GameScene.ColorPalette;
 using Scenes.GameScene.Level;
 using Sirenix.OdinInspector;
@@ -37,7 +37,7 @@ namespace Core.Installers
             Container.Bind<LevelProvider>().AsSingle().WithArguments(levelCollection);
             Container.Bind<PlayerProgressService>().AsSingle().WithArguments(coinsPerLevel);
             Container.Bind<ISaveSystem<PlayerData>>().To<SaveSystemAdapter<PlayerData>>().AsSingle();
-            Container.BindInterfacesAndSelfTo<LevelController>().AsSingle().WithArguments(hintManager);
+            Container.BindInterfacesAndSelfTo<LevelController>().AsSingle();
             Container.Bind<LevelCompletionChecker>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelProgressHandler>().AsSingle();
             
@@ -47,7 +47,8 @@ namespace Core.Installers
                 .FromComponentInNewPrefab(bottlePrefab)
                 .UnderTransform(bottlesParentTransform);
 
-            Container.Bind<MovesManager>().AsSingle();
+            Container.Bind<HintManager>().FromInstance(hintManager).AsSingle();
+            Container.Bind<MoveHistory>().AsSingle();
             Container.Bind<BestMoveFinder>().AsSingle();
             Container.Bind<IGameLogger>().To<GameLogger>().AsSingle();
             Debug.Log("Game scene data loaded");

@@ -36,7 +36,7 @@
             
             public void FillUp(float fillUpToAdd) => shaderController.FillUp(fillUpToAdd);
             
-            public void AddColor(Color color, int count) => shaderController.AddColor(color, count);
+            public void AddColor(Color color, int count, bool isVisible) => shaderController.AddColor(color, count, isVisible);
 
             public void RemoveTopColor(int count) => shaderController.RemoveTopColor(count);
             
@@ -44,7 +44,7 @@
             {
                 var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(countOfColor: GetNumberOfTopColorLayers());
                 var colorToTransfer = GetTopColor();
-                targetBottle.AddColor(colorToTransfer, countOfColorToTransfer);
+                targetBottle.AddColor(colorToTransfer, countOfColorToTransfer, false);
                 targetBottle.IncreaseUsagesCount();
                 InUse = true;
                 view.SetSortingOrder(true);
@@ -77,9 +77,9 @@
 
             public bool IsFullByOneColor() => shaderController.IsFullByOneColor();
 
-            private int GetNumberOfTopColorLayers() => shaderController.NumberOfTopColor();
+            public int GetNumberOfTopColorLayers() => shaderController.NumberOfTopColor();
 
-            private int NumberOfColorToTransfer(int countOfColor) => shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
+            public int NumberOfColorToTransfer(int countOfColor) => shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
 
             public Stack<Color> GetColors() => shaderController.Colors();
 

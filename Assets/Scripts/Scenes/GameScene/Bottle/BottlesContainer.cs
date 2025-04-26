@@ -12,7 +12,7 @@ namespace Scenes.GameScene.Bottle
 
         private List<Bottle> bottles;
         public event Action<List<Bottle>> OnBottlesCreated;
-        public event Action OnBottlesDeleted;
+        public event Action<List<Bottle>> OnBottlesDeleted;
 
         [Inject]
         public BottlesContainer(
@@ -41,13 +41,13 @@ namespace Scenes.GameScene.Bottle
         public void DeleteBottles()
         {
             if (bottles == null) return;
+            OnBottlesDeleted?.Invoke(bottles);
 
             foreach (var bottle in bottles)
             {
                 UnityEngine.Object.Destroy(bottle.gameObject);
             }
             bottles.Clear();
-            OnBottlesDeleted?.Invoke();
         }
 
         public Bottle GetBottle(int index) => 
@@ -57,7 +57,6 @@ namespace Scenes.GameScene.Bottle
         {
             if (bottle == null) throw new ArgumentNullException(nameof(bottle));
             if (bottles == null) throw new ArgumentNullException(nameof(bottles));
-
             return bottles.IndexOf(bottle);
         }
 

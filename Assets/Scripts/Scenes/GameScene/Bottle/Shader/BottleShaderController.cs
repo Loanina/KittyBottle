@@ -21,10 +21,11 @@ namespace Scenes.GameScene.Bottle.Shader
             shader.UpdateFillAmount(colorStackHandler.Colors.Count);
         }
 
-        public void AddColor(Color color, int count)
+        public void AddColor(Color color, int count, bool isVisible)
         {
             colorStackHandler.Add(color, count);
             shader.SetColors(colorStackHandler.Colors);
+            if (isVisible) shader.UpdateFillAmount(colorStackHandler.Colors.Count);
         }
 
         public void RotateComplete(float angle, int transferCount)
