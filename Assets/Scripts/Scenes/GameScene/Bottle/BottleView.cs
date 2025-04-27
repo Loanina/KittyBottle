@@ -40,5 +40,11 @@ namespace Scenes.GameScene.Bottle
         {
             sortingGroup.sortingOrder = toUp ? 2 : 1;
         }
+
+        public void StopColorFlow()
+        {
+            rightColorFlow.enabled = false;
+            leftColorFlow.enabled = false;
+        }
     }
 }

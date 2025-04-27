@@ -18,28 +18,31 @@ namespace Scenes.GameScene.Bottle.Shader
         {
             colorStackHandler.Initialize(colors);
             shader.SetColors(colorStackHandler.Colors);
-            shader.UpdateFillAmount(colorStackHandler.Colors.Count);
+            UpdateFillAmount();
         }
 
         public void AddColor(Color color, int count, bool isVisible)
         {
             colorStackHandler.Add(color, count);
             shader.SetColors(colorStackHandler.Colors);
-            if (isVisible) shader.UpdateFillAmount(colorStackHandler.Colors.Count);
+            if (isVisible) UpdateFillAmount();
         }
 
-        public void RotateComplete(float angle, int transferCount)
+        public void RotateComplete(float angle)
         {
             shader.SetRotation(angle);
             shader.SetFillFromCurve(angle);
-            colorStackHandler.Remove(transferCount);
+        }
+
+        public void UpdateFillAmount()
+        {
+            shader.UpdateFillAmount(colorStackHandler.Colors.Count);
         }
 
         public void RemoveTopColor(int count)
         {
-            var remaining = colorStackHandler.Colors.Count - count;
-            shader.UpdateFillAmount(remaining);
             colorStackHandler.Remove(count);
+            UpdateFillAmount();
         }
 
         public void Rotate(float angle, float lastAngle, Bottle targetBottle)

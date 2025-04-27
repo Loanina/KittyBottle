@@ -1,5 +1,6 @@
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using Core.InputSystem;
     using Cysharp.Threading.Tasks;
     using Scenes.GameScene.Bottle.Animation;
@@ -17,6 +18,7 @@
             public bool InUse { get; private set; }
             public int UsesCount { get; private set; }
             public event Action<Bottle> OnClicked;
+            private CancellationTokenSource pouringCancellationTokenSource;
 
             [Inject]
             public void Construct(BottleShaderController shaderController, BottleAnimationController bottleAnimationController, BottleView view)
@@ -30,6 +32,12 @@
             {
                 shaderController.Initialize(bottleColors);
                 bottleAnimationController.SetDefaultPosition();
+            }
+            
+            private void OnDestroy()
+            {
+                pouringCancellationTokenSource?.Cancel();
+                pouringCancellationTokenSource?.Dispose();
             }
             
             public void OnClick() => OnClicked?.Invoke(this);
@@ -48,8 +56,15 @@
                 targetBottle.IncreaseUsagesCount();
                 InUse = true;
                 view.SetSortingOrder(true);
-
-                var cancellationTokenOnDestroy = this.GetCancellationTokenOnDestroy();
+                
+                pouringCancellationTokenSource?.Cancel();
+                pouringCancellationTokenSource?.Dispose();
+                pouringCancellationTokenSource = new CancellationTokenSource();
+                var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(
+                    pouringCancellationTokenSource.Token,
+                    this.GetCancellationTokenOnDestroy()
+                );
+                var cancellationToken = linkedCancellationTokenSource.Token;
 
                 try
                 {
@@ -57,7 +72,7 @@
                         targetBottle,
                         colorToTransfer,
                         countOfColorToTransfer,
-                        cancellationTokenOnDestroy
+                        cancellationToken
                     );
                     InUse = false;
                     view.SetSortingOrder(false);
@@ -66,6 +81,15 @@
                 catch (OperationCanceledException)
                 {
                     InUse = false;
+                }
+            }
+
+            public async UniTask CancelAnimationAsync()
+            {
+                if (pouringCancellationTokenSource != null && !pouringCancellationTokenSource.IsCancellationRequested)
+                {
+                    pouringCancellationTokenSource.Cancel();
+                    await UniTask.WaitUntil(() => !InUse, cancellationToken: this.GetCancellationTokenOnDestroy());
                 }
             }
 
@@ -92,5 +116,7 @@
 
             public void GoToStartPosition() => bottleAnimationController.GoToStartPosition();
             public void GoUp() => bottleAnimationController.GoUp();
+
+            public void UpdateFillAmount() => shaderController.UpdateFillAmount();
         }
     }

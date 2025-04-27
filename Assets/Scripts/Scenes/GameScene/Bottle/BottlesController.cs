@@ -73,7 +73,7 @@ namespace Scenes.GameScene.Bottle
                 secondBottle = bottle;
                 Debug.Log("Second bottle selected");
 
-                TransferColor();
+                TransferColor(firstBottle, secondBottle);
                 ClearSelection();
             }
         }
@@ -84,36 +84,43 @@ namespace Scenes.GameScene.Bottle
             secondBottle = null;
         }
 
-        private bool CanTransferColor() => !firstBottle.IsEmpty() && secondBottle.EnableToFill(firstBottle.GetTopColor());
+        private bool CanTransferColor(Bottle from, Bottle to) => !from.IsEmpty() && to.EnableToFill(from.GetTopColor());
 
-        private void TransferColor()
+        private void TransferColor(Bottle from, Bottle to)
         {
-            if (!CanTransferColor())
+            if (!CanTransferColor(from, to))
             {
-                firstBottle.GoToStartPosition();
+                from.GoToStartPosition();
                 return;
             }
             
             hintManager.AddMove(
-                bottlesContainer.GetIndexOfBottle(firstBottle),
-                bottlesContainer.GetIndexOfBottle(secondBottle),
-                secondBottle.NumberOfColorToTransfer(firstBottle.GetNumberOfTopColorLayers())
+                bottlesContainer.GetIndexOfBottle(from),
+                bottlesContainer.GetIndexOfBottle(to),
+                to.NumberOfColorToTransfer(from.GetNumberOfTopColorLayers())
             );
 
-            firstBottle.PouringColorsBetweenBottles(secondBottle, () =>
+            from.PouringColorsBetweenBottles(to, () =>
             {
                 OnPouringEnd?.Invoke();
             });
         }
 
-        private void ReturnMove(Move move) => TransferColorWithoutAnimation(move.To, move.From, move.TransferAmount);
-
-        private void TransferColorWithoutAnimation(int from, int to, int countOfColorToTransfer)
+        private async void ReturnMove(Move move)
         {
-            var bottleFrom = bottlesContainer.GetBottle(from);
-            var bottleTo = bottlesContainer.GetBottle(to);
-            bottleTo.AddColor(bottleFrom.GetTopColor(), countOfColorToTransfer, true);
-            bottleFrom.RemoveTopColor(countOfColorToTransfer);
+            var bottleFrom = bottlesContainer.GetBottle(move.From);
+            var bottleTo = bottlesContainer.GetBottle(move.To);
+            
+            await bottleTo.CancelAnimationAsync();
+            await bottleFrom.CancelAnimationAsync();
+    
+            TransferColorWithoutAnimation(bottleTo, bottleFrom, move.TransferAmount);
+        }
+
+        private void TransferColorWithoutAnimation(Bottle from, Bottle to, int countOfColorToTransfer)
+        {
+            to.AddColor(from .GetTopColor(), countOfColorToTransfer, true);
+            from.RemoveTopColor(countOfColorToTransfer);
         }
     }
 }

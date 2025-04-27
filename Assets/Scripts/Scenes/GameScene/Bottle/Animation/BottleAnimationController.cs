@@ -94,6 +94,8 @@ namespace Scenes.GameScene.Bottle.Animation
             int countOfColorToTransfer,
             CancellationToken cancellationToken = default)
         {
+            var isRotateCompleteCalled = false;
+            var isDecreaseUsageCalled = false;
             try
             {
                 var rotationData = GetRotationData(targetBottle.transform.position.x);
@@ -141,8 +143,11 @@ namespace Scenes.GameScene.Bottle.Animation
                 );
 
                 view.SetColorFlow(rotationData.IsClockwise, false);
-                shaderController.RotateComplete(toAngle, countOfColorToTransfer);
+                shaderController.RotateComplete(toAngle);
+                shaderController.RemoveTopColor(countOfColorToTransfer);
+                isRotateCompleteCalled = true;
                 targetBottle.DecreaseUsagesCount();
+                isDecreaseUsageCalled = true;
 
                 // Move and rotate back
                 var moveBack = bottleTransform
@@ -166,17 +171,37 @@ namespace Scenes.GameScene.Bottle.Animation
                     )
                 );
 
-                view.glassTransform.eulerAngles = new Vector3(0, 0, 0);
+                view.glassTransform.eulerAngles = Vector3.zero;
                 shaderController.Rotate(0f);
             }
             catch (OperationCanceledException)
             {
+                RestoreDefaultState(isRotateCompleteCalled, isDecreaseUsageCalled, targetBottle, countOfColorToTransfer);
                 Debug.Log("[PouringAnimation] cancelled correctly");
             }
             catch (Exception ex)
             {
                 Debug.LogError($"[PouringAnimation] Unexpected error: {ex}");
             }
+        }
+
+        private void RestoreDefaultState(bool isRotateCompleteCalled, bool isDecreaseUsageCalled, Bottle targetBottle, int colorCountToTransfer)
+        {
+            Debug.Log($"{isDecreaseUsageCalled}, {isRotateCompleteCalled}, count {colorCountToTransfer}");
+            if (!isRotateCompleteCalled)
+            {
+                shaderController.RotateComplete(0f);
+                shaderController.RemoveTopColor(colorCountToTransfer);
+            }
+            if (!isDecreaseUsageCalled) targetBottle.DecreaseUsagesCount();
+            
+            DOTween.Kill(bottleTransform);
+            bottleTransform.position = defaultPosition;
+            view.glassTransform.eulerAngles = Vector3.zero;
+            view.glassTransform.localPosition = Vector3.zero;
+            view.StopColorFlow();
+            shaderController.Rotate(0f);
+            targetBottle.UpdateFillAmount();
         }
     }
 }
