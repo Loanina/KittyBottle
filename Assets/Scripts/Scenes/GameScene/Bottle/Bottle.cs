@@ -1,129 +1,134 @@
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using Core.InputSystem;
-    using Cysharp.Threading.Tasks;
-    using Scenes.GameScene.Bottle.Animation;
-    using Scenes.GameScene.Bottle.Shader;
-    using UnityEngine;
-    using Zenject;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Core.InputSystem;
+using Cysharp.Threading.Tasks;
+using Scenes.GameScene.Bottle.Animation;
+using Scenes.GameScene.Bottle.Shader;
+using UnityEngine;
+using Zenject;
 
-    namespace Scenes.GameScene.Bottle
+namespace Scenes.GameScene.Bottle
+{
+    public class Bottle : MonoBehaviour, IClickable
     {
-        public class Bottle : MonoBehaviour, IClickable
+        private BottleShaderController shaderController;
+        private BottleAnimationController animationController;
+        private BottleView view;
+        private CancellationTokenSource pouringCts;
+
+        public bool InUse { get; private set; }
+        public int UsesCount { get; private set; }
+        private bool IsPouring { get; set; }
+        public event Action<Bottle> OnClicked;
+
+        [Inject]
+        public void Construct(BottleShaderController shaderController, BottleAnimationController animationController, BottleView view)
         {
-            private BottleShaderController shaderController;
-            private BottleAnimationController bottleAnimationController;
-            private BottleView view;
-            private bool isPouring;
-            public bool InUse { get; private set; }
-            public int UsesCount { get; private set; }
-            public event Action<Bottle> OnClicked;
-            private CancellationTokenSource pouringCancellationTokenSource;
+            this.shaderController = shaderController;
+            this.animationController = animationController;
+            this.view = view;
+        }
 
-            [Inject]
-            public void Construct(BottleShaderController shaderController, BottleAnimationController bottleAnimationController, BottleView view)
+        public void Initialize(List<Color> bottleColors)
+        {
+            shaderController.Initialize(bottleColors);
+            animationController.SetDefaultPosition();
+        }
+
+        private void OnDestroy()
+        {
+            pouringCts?.Cancel();
+            pouringCts?.Dispose();
+        }
+
+        public void OnClick()
+        {
+            OnClicked?.Invoke(this);
+        }
+
+        public async UniTask PourColorsAsync(Bottle target, Action onComplete = null)
+        {
+            var color = GetTopColor();
+            var count = target.GetTransferableCount(GetTopColorLayers());
+
+            target.AddColor(color, count, false);
+            target.IncreaseUsageCount();
+
+            InUse = true;
+            view.SetSortingOrder(true);
+
+            pouringCts?.Dispose();
+            pouringCts = new CancellationTokenSource();
+            var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(
+                pouringCts.Token, this.GetCancellationTokenOnDestroy()
+            ).Token;
+
+            IsPouring = true;
+
+            try
             {
-                this.shaderController = shaderController;
-                this.bottleAnimationController = bottleAnimationController;
-                this.view = view;
+                await animationController.PouringAnimationAsync(target, color, count, linkedToken);
+                onComplete?.Invoke();
             }
-            
-            public void Initialize(List<Color> bottleColors)
+            catch (OperationCanceledException)
             {
-                shaderController.Initialize(bottleColors);
-                bottleAnimationController.SetDefaultPosition();
+                Debug.Log("Pouring was canceled");
             }
-            
-            private void OnDestroy()
+            finally
             {
-                pouringCancellationTokenSource?.Cancel();
-                pouringCancellationTokenSource?.Dispose();
+                IsPouring = false;
+                InUse = false;
+                view.SetSortingOrder(false);
+                pouringCts?.Dispose();
+                pouringCts = null;
             }
-            
-            public void OnClick() => OnClicked?.Invoke(this);
-            
-            public void FillUp(float fillUpToAdd) => shaderController.FillUp(fillUpToAdd);
-            
-            public void AddColor(Color color, int count, bool isVisible) => shaderController.AddColor(color, count, isVisible);
+        }
 
-            public void RemoveTopColor(int count) => shaderController.RemoveTopColor(count);
-            
-            public async void PouringColorsBetweenBottles(Bottle targetBottle, Action onComplete = null)
-            {
-                var countOfColorToTransfer = targetBottle.NumberOfColorToTransfer(countOfColor: GetNumberOfTopColorLayers());
-                var colorToTransfer = GetTopColor();
-                targetBottle.AddColor(colorToTransfer, countOfColorToTransfer, false);
-                targetBottle.IncreaseUsagesCount();
-                InUse = true;
-                view.SetSortingOrder(true);
+        public async UniTask CancelAnimationAsync()
+        {
+            if (pouringCts == null || pouringCts.IsCancellationRequested)
+                return;
 
-                isPouring = true;
-                pouringCancellationTokenSource?.Dispose();
-                pouringCancellationTokenSource = new CancellationTokenSource();
-                var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(
-                    pouringCancellationTokenSource.Token,
-                    this.GetCancellationTokenOnDestroy()
-                ).Token;
+            pouringCts.Cancel();
 
-                try
-                {
-                    await bottleAnimationController.PouringAnimationAsync(
-                        targetBottle,
-                        colorToTransfer,
-                        countOfColorToTransfer,
-                        linkedToken
-                    );
-                    InUse = false;
-                    view.SetSortingOrder(false);
-                    onComplete?.Invoke();
-                }
-                catch (OperationCanceledException)
-                {
-                    InUse = false;
-                }
-                finally
-                {
-                    isPouring = false;
-                    pouringCancellationTokenSource?.Dispose();
-                    pouringCancellationTokenSource = null;
-                }
-            }
+            await UniTask.WaitWhile(() => IsPouring,
+                cancellationToken: this.GetCancellationTokenOnDestroy());
+        }
+        
+        public void FillUp(float value)
+        {
+            shaderController.FillUp(value);
+        }
 
-            public async UniTask CancelAnimationAsync()
-            {
-                var cts = pouringCancellationTokenSource;
-                if (cts == null || cts.IsCancellationRequested) 
-                    return;
-                cts.Cancel();
-                await UniTask.WaitWhile(() => isPouring, 
-                    cancellationToken: this.GetCancellationTokenOnDestroy());
-            }
+        public void AddColor(Color color, int count, bool visible)
+        {
+            shaderController.AddColor(color, count, visible);
+        }
 
-            public bool EnableToFill(Color color) => shaderController.CanFill(color);
+        public void RemoveTopColor(int count)
+        {
+            shaderController.RemoveTopColor(count);
+        }
 
-            public Color GetTopColor() => shaderController.TopColor();
+        public void GoToStartPosition() => animationController.GoToStartPosition();
+        public void GoUp() => animationController.GoUp();
 
-            public bool IsEmpty() => shaderController.IsEmpty();
+        public void UpdateFillAmount() => shaderController.UpdateFillAmount();
 
-            public bool IsFullByOneColor() => shaderController.IsFullByOneColor();
+        public Color GetTopColor() => shaderController.TopColor();
+        public Stack<Color> GetColors() => shaderController.Colors();
+        public int GetTopColorLayers() => shaderController.NumberOfTopColor();
+        public int GetTransferableCount(int count) => shaderController.CalculateNumberOfColorsToTransfer(count);
 
-            public int GetNumberOfTopColorLayers() => shaderController.NumberOfTopColor();
+        public bool CanFill(Color color) => shaderController.CanFill(color);
+        public bool IsEmpty() => shaderController.IsEmpty();
+        public bool IsFullByOneColor() => shaderController.IsFullByOneColor();
 
-            public int NumberOfColorToTransfer(int countOfColor) => shaderController.CalculateNumberOfColorsToTransfer(countOfColor);
-
-            public Stack<Color> GetColors() => shaderController.Colors();
-
-            private void IncreaseUsagesCount() => UsesCount += 1;
-
-            public void DecreaseUsagesCount()
-            {
-                if (UsesCount > 0) UsesCount -= 1;
-            }
-
-            public void GoToStartPosition() => bottleAnimationController.GoToStartPosition();
-            public void GoUp() => bottleAnimationController.GoUp();
-
-            public void UpdateFillAmount() => shaderController.UpdateFillAmount();
+        private void IncreaseUsageCount() => UsesCount++;
+        public void DecreaseUsageCount()
+        {
+            if (UsesCount > 0) UsesCount--;
         }
     }
+}

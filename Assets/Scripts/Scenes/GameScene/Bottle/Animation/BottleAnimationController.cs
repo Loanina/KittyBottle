@@ -146,7 +146,7 @@ namespace Scenes.GameScene.Bottle.Animation
                 shaderController.RotateComplete(toAngle);
                 shaderController.RemoveTopColor(countOfColorToTransfer);
                 isRotateCompleteCalled = true;
-                targetBottle.DecreaseUsagesCount();
+                targetBottle.DecreaseUsageCount();
                 isDecreaseUsageCalled = true;
 
                 // Move and rotate back
@@ -192,7 +192,7 @@ namespace Scenes.GameScene.Bottle.Animation
                 shaderController.RotateComplete(0f);
                 shaderController.RemoveTopColor(colorCountToTransfer);
             }
-            if (!isDecreaseUsageCalled) targetBottle.DecreaseUsagesCount();
+            if (!isDecreaseUsageCalled) targetBottle.DecreaseUsageCount();
             
             DOTween.Kill(bottleTransform);
             bottleTransform.position = defaultPosition;

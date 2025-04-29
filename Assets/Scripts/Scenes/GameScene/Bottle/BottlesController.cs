@@ -85,7 +85,7 @@ namespace Scenes.GameScene.Bottle
             secondBottle = null;
         }
 
-        private bool CanTransferColor(Bottle from, Bottle to) => !from.IsEmpty() && to.EnableToFill(from.GetTopColor());
+        private bool CanTransferColor(Bottle from, Bottle to) => !from.IsEmpty() && to.CanFill(from.GetTopColor());
 
         private void TransferColor(Bottle from, Bottle to)
         {
@@ -98,13 +98,10 @@ namespace Scenes.GameScene.Bottle
             hintManager.AddMove(
                 bottlesContainer.GetIndexOfBottle(from),
                 bottlesContainer.GetIndexOfBottle(to),
-                to.NumberOfColorToTransfer(from.GetNumberOfTopColorLayers())
+                to.GetTransferableCount(from.GetTopColorLayers())
             );
 
-            from.PouringColorsBetweenBottles(to, () =>
-            {
-                OnPouringEnd?.Invoke();
-            });
+            from.PourColorsAsync(to, OnPouringEnd).Forget();
         }
 
         private async void ReturnMove(Move move)
