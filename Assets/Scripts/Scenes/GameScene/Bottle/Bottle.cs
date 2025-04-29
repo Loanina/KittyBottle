@@ -15,19 +15,19 @@ namespace Scenes.GameScene.Bottle
         private BottleShaderController shaderController;
         private BottleAnimationController animationController;
         private BottleView view;
+        private BottleUsageController usageController;
         private CancellationTokenSource pouringCts;
-
-        public bool InUse { get; private set; }
-        public int UsesCount { get; private set; }
-        private bool IsPouring { get; set; }
+        private bool isPouring;
         public event Action<Bottle> OnClicked;
 
         [Inject]
-        public void Construct(BottleShaderController shaderController, BottleAnimationController animationController, BottleView view)
+        public void Construct(BottleShaderController shaderController, BottleAnimationController animationController, 
+            BottleView view, BottleUsageController usageController)
         {
             this.shaderController = shaderController;
             this.animationController = animationController;
             this.view = view;
+            this.usageController = usageController;
         }
 
         public void Initialize(List<Color> bottleColors)
@@ -47,42 +47,15 @@ namespace Scenes.GameScene.Bottle
             OnClicked?.Invoke(this);
         }
 
-        public async UniTask PourColorsAsync(Bottle target, Action onComplete = null)
+        private CancellationToken GetPouringCancellationToken()
         {
-            var color = GetTopColor();
-            var count = target.GetTransferableCount(GetTopColorLayers());
-
-            target.AddColor(color, count, false);
-            target.IncreaseUsageCount();
-
-            InUse = true;
-            view.SetSortingOrder(true);
-
             pouringCts?.Dispose();
             pouringCts = new CancellationTokenSource();
             var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 pouringCts.Token, this.GetCancellationTokenOnDestroy()
             ).Token;
 
-            IsPouring = true;
-
-            try
-            {
-                await animationController.PouringAnimationAsync(target, color, count, linkedToken);
-                onComplete?.Invoke();
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.Log("Pouring was canceled");
-            }
-            finally
-            {
-                IsPouring = false;
-                InUse = false;
-                view.SetSortingOrder(false);
-                pouringCts?.Dispose();
-                pouringCts = null;
-            }
+            return linkedToken;
         }
 
         public async UniTask CancelAnimationAsync()
@@ -92,7 +65,7 @@ namespace Scenes.GameScene.Bottle
 
             pouringCts.Cancel();
 
-            await UniTask.WaitWhile(() => IsPouring,
+            await UniTask.WaitWhile(() => isPouring,
                 cancellationToken: this.GetCancellationTokenOnDestroy());
         }
         
@@ -111,6 +84,11 @@ namespace Scenes.GameScene.Bottle
             shaderController.RemoveTopColor(count);
         }
 
+        public UniTask PouringAnimationAsync(Bottle targetBottle,
+            Color colorToTransfer,
+            int countOfColorToTransfer) => 
+            animationController.PouringAnimationAsync(targetBottle, colorToTransfer, countOfColorToTransfer, GetPouringCancellationToken());
+
         public void GoToStartPosition() => animationController.GoToStartPosition();
         public void GoUp() => animationController.GoUp();
 
@@ -125,10 +103,14 @@ namespace Scenes.GameScene.Bottle
         public bool IsEmpty() => shaderController.IsEmpty();
         public bool IsFullByOneColor() => shaderController.IsFullByOneColor();
 
-        private void IncreaseUsageCount() => UsesCount++;
-        public void DecreaseUsageCount()
-        {
-            if (UsesCount > 0) UsesCount--;
-        }
+        public void IncreaseUsageCount() => usageController.IncreaseUsageCount();
+        public void DecreaseUsageCount() => usageController.DecreaseUsageCount();
+
+        public void StartUse() => usageController.StartUse();
+        public void EndUse() => usageController.EndUse();
+        public bool InUse => usageController.InUse;
+        public int UsesCount => usageController.UsesCount;
+        public void SetSortingOrder(bool toUp) => view.SetSortingOrder(toUp);
+        public void SetPouring(bool isPouring) => this.isPouring = isPouring;
     }
 }

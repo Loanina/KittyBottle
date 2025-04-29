@@ -12,14 +12,16 @@ namespace Scenes.GameScene.Bottle
     {
         private readonly BottlesContainer bottlesContainer;
         private readonly HintManager hintManager;
+        private readonly PouringService pouringService;
         private Bottle firstBottle;
         private Bottle secondBottle;
 
         [Inject]
-        public BottlesController(BottlesContainer bottlesContainer, HintManager hintManager)
+        public BottlesController(BottlesContainer bottlesContainer, HintManager hintManager, PouringService pouringService)
         {
             this.bottlesContainer = bottlesContainer;
             this.hintManager = hintManager;
+            this.pouringService = pouringService;
         }
 
         public void Dispose()
@@ -94,14 +96,16 @@ namespace Scenes.GameScene.Bottle
                 from.GoToStartPosition();
                 return;
             }
+
+            var countOfColorToTransfer = to.GetTransferableCount(from.GetTopColorLayers());
             
             hintManager.AddMove(
                 bottlesContainer.GetIndexOfBottle(from),
                 bottlesContainer.GetIndexOfBottle(to),
-                to.GetTransferableCount(from.GetTopColorLayers())
+                countOfColorToTransfer
             );
 
-            from.PourColorsAsync(to, OnPouringEnd).Forget();
+            pouringService.TransferAsync(from, to, from.GetTopColor(), countOfColorToTransfer, OnPouringEnd).Forget();
         }
 
         private async void ReturnMove(Move move)

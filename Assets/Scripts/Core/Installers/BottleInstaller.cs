@@ -22,6 +22,7 @@ namespace Core.Installers
             Container.Bind<ColorStackHandler>().AsSingle().WithArguments(shaderConfig.maxColorsInBottle);
             Container.Bind<BottleShaderController>().AsSingle();
             Container.Bind<BottleAnimationController>().AsSingle().WithArguments(animationConfig, transform);
+            Container.Bind<BottleUsageController>().AsSingle();
         }
     }
 }

@@ -46,6 +46,7 @@ namespace Core.Installers
             Container.BindFactory<Bottle, BottleFactory>()
                 .FromComponentInNewPrefab(bottlePrefab)
                 .UnderTransform(bottlesParentTransform);
+            Container.Bind<PouringService>().AsSingle();
 
             Container.Bind<HintManager>().FromInstance(hintManager).AsSingle();
             Container.Bind<MoveHistory>().AsSingle();
