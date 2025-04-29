@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core.Hints;
 using Core.Hints.Moves;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -111,10 +112,19 @@ namespace Scenes.GameScene.Bottle
             var bottleFrom = bottlesContainer.GetBottle(move.From);
             var bottleTo = bottlesContainer.GetBottle(move.To);
             
-            await bottleTo.CancelAnimationAsync();
-            await bottleFrom.CancelAnimationAsync();
-    
-            TransferColorWithoutAnimation(bottleTo, bottleFrom, move.TransferAmount);
+            try
+            {
+                await UniTask.WhenAll(
+                    bottleFrom.CancelAnimationAsync(),
+                    bottleTo.CancelAnimationAsync()
+                );
+
+                TransferColorWithoutAnimation(bottleTo, bottleFrom, move.TransferAmount);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.LogWarning("[ReturnMove] The animation was canceled during the turn back. No further actions are performed.");
+            }
         }
 
         private void TransferColorWithoutAnimation(Bottle from, Bottle to, int countOfColorToTransfer)

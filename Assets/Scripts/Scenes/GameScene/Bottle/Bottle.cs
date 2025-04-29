@@ -15,6 +15,7 @@
             private BottleShaderController shaderController;
             private BottleAnimationController bottleAnimationController;
             private BottleView view;
+            private bool isPouring;
             public bool InUse { get; private set; }
             public int UsesCount { get; private set; }
             public event Action<Bottle> OnClicked;
@@ -56,15 +57,14 @@
                 targetBottle.IncreaseUsagesCount();
                 InUse = true;
                 view.SetSortingOrder(true);
-                
-                pouringCancellationTokenSource?.Cancel();
+
+                isPouring = true;
                 pouringCancellationTokenSource?.Dispose();
                 pouringCancellationTokenSource = new CancellationTokenSource();
-                var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(
+                var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(
                     pouringCancellationTokenSource.Token,
                     this.GetCancellationTokenOnDestroy()
-                );
-                var cancellationToken = linkedCancellationTokenSource.Token;
+                ).Token;
 
                 try
                 {
@@ -72,7 +72,7 @@
                         targetBottle,
                         colorToTransfer,
                         countOfColorToTransfer,
-                        cancellationToken
+                        linkedToken
                     );
                     InUse = false;
                     view.SetSortingOrder(false);
@@ -82,15 +82,22 @@
                 {
                     InUse = false;
                 }
+                finally
+                {
+                    isPouring = false;
+                    pouringCancellationTokenSource?.Dispose();
+                    pouringCancellationTokenSource = null;
+                }
             }
 
             public async UniTask CancelAnimationAsync()
             {
-                if (pouringCancellationTokenSource != null && !pouringCancellationTokenSource.IsCancellationRequested)
-                {
-                    pouringCancellationTokenSource.Cancel();
-                    await UniTask.WaitUntil(() => !InUse, cancellationToken: this.GetCancellationTokenOnDestroy());
-                }
+                var cts = pouringCancellationTokenSource;
+                if (cts == null || cts.IsCancellationRequested) 
+                    return;
+                cts.Cancel();
+                await UniTask.WaitWhile(() => isPouring, 
+                    cancellationToken: this.GetCancellationTokenOnDestroy());
             }
 
             public bool EnableToFill(Color color) => shaderController.CanFill(color);

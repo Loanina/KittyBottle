@@ -187,7 +187,6 @@ namespace Scenes.GameScene.Bottle.Animation
 
         private void RestoreDefaultState(bool isRotateCompleteCalled, bool isDecreaseUsageCalled, Bottle targetBottle, int colorCountToTransfer)
         {
-            Debug.Log($"{isDecreaseUsageCalled}, {isRotateCompleteCalled}, count {colorCountToTransfer}");
             if (!isRotateCompleteCalled)
             {
                 shaderController.RotateComplete(0f);
