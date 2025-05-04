@@ -31,8 +31,6 @@ namespace Scenes.GameScene.ColorPalette
             currentColorPalette = colorPaletteCollection.colorPalettes[paletteIndex];
         }
 
-        public ColorPalette GetCurrentColorPalette() => currentColorPalette;
-        
         public Color GetColorByIndex(int index) => currentColorPalette.GetColor(index);
     }
 }
