@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -45,7 +46,8 @@ namespace Scenes.GameScene.Bottle
 
             foreach (var bottle in bottles)
             {
-                UnityEngine.Object.Destroy(bottle.gameObject);
+                bottle.CancelAnimationAsync()
+                    .ContinueWith(() => UnityEngine.Object.Destroy(bottle.gameObject)).Forget();
             }
             bottles.Clear();
         }
