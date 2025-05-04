@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Core.Hints;
 using Core.Hints.Moves;
 using Cysharp.Threading.Tasks;
+using Scenes.GameScene.Hints;
 using UnityEngine;
 using Zenject;
 

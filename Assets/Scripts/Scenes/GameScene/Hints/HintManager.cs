@@ -3,7 +3,7 @@ using Core.Hints.Moves;
 using UnityEngine;
 using Zenject;
 
-namespace Core.Hints
+namespace Scenes.GameScene.Hints
 {
     public class HintManager : MonoBehaviour
     {

@@ -1,7 +1,7 @@
 using System;
-using Core.Hints;
 using Core.SavingSystem;
 using Scenes.GameScene.Bottle;
+using Scenes.GameScene.Hints;
 using Zenject;
 
 namespace Scenes.GameScene.Level
@@ -15,6 +15,7 @@ namespace Scenes.GameScene.Level
         private readonly LevelColorMapper colorMapper;
         private readonly PlayerProgressService progressService;
         private readonly HintManager hintManager;
+        private readonly MoneyManager moneyManager;
 
         [Inject]
         public LevelController(
@@ -22,13 +23,15 @@ namespace Scenes.GameScene.Level
             BottlesContainer bottlesContainer,
             LevelColorMapper colorMapper,
             PlayerProgressService progressService,
-            HintManager hintManager)
+            HintManager hintManager,
+            MoneyManager moneyManager)
         {
             this.levelProvider = levelProvider;
             this.bottlesContainer = bottlesContainer;
             this.colorMapper = colorMapper;
             this.progressService = progressService;
             this.hintManager = hintManager;
+            this.moneyManager = moneyManager;
         }
 
         public void Initialize()
@@ -39,7 +42,7 @@ namespace Scenes.GameScene.Level
         }
         
         private int LoadProgress() => 
-            progressService.GetLastCompletedLevel() + 1;
+            progressService.GetLastCompletedLevelID() + 1;
 
         private void SubscribeToEvents()
         {
@@ -60,7 +63,8 @@ namespace Scenes.GameScene.Level
 
         public void HandleLevelComplete()
         {
-            progressService.UpdateProgress(currentLevelIndex);
+            progressService.SetLastCompletedLevel(currentLevelIndex);
+            moneyManager.AddCoinsForLevel();
             bottlesContainer.DeleteBottles();
             currentLevelIndex++;
             LoadLevel(currentLevelIndex);

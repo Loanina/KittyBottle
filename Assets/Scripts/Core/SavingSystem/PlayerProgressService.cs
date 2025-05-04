@@ -6,25 +6,30 @@ namespace Core.SavingSystem
     public class PlayerProgressService
     {
         private readonly ISaveSystem<PlayerData> saveSystem;
-        private readonly int coinsPerLevel;
 
         [Inject]
-        public PlayerProgressService(ISaveSystem<PlayerData> saveSystem, int coinsPerLevel)
+        public PlayerProgressService(ISaveSystem<PlayerData> saveSystem)
         {
             this.saveSystem = saveSystem;
-            this.coinsPerLevel = coinsPerLevel;
         }
     
-        public int GetLastCompletedLevel()
+        public int GetLastCompletedLevelID()
         {
             return saveSystem.Load().lastLevelID;
         }
 
-        public void UpdateProgress(int levelIndex)
+        public void SetLastCompletedLevel(int levelIndex)
         {
             var data = saveSystem.Load();
-            data.coins += coinsPerLevel;
             data.lastLevelID = levelIndex;
+            saveSystem.Save(data);
+        }
+
+        public int GetMoneyCount() => saveSystem.Load().coins;
+        public void SetMoney(int coins)
+        {
+            var data = saveSystem.Load();
+            data.coins = coins;
             saveSystem.Save(data);
         }
     }

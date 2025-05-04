@@ -5,7 +5,7 @@ using Common.Logging;
 using Scenes.GameScene.Bottle;
 using Zenject;
 
-namespace Core.Hints
+namespace Scenes.GameScene.Hints
 {
     public class BestMoveFinder
     {
