@@ -154,3 +154,8 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  reward:
+    coins: 10
+    hints: 0
+    undoMoves: 2
+    tickets: 0

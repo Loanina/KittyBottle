@@ -8,6 +8,7 @@ using Scenes.GameScene.Bottle;
 using Scenes.GameScene.ColorPalette;
 using Scenes.GameScene.Hints;
 using Scenes.GameScene.Level;
+using Scenes.GameScene.Reward;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -24,6 +25,8 @@ namespace Core.Installers
         [SerializeField] private Bottle bottlePrefab;
         [SerializeField] private LayoutSettings layoutSettings;
         [SerializeField] private Transform bottlesParentTransform;
+        [SerializeField] private RewardConfig rewardConfig;
+        [SerializeField] private Transform rewardParent;
 
         [Button("Clear player data")]
         private void ClearPlayerData()
@@ -55,6 +58,9 @@ namespace Core.Installers
             Container.Bind<MoveHistory>().AsSingle();
             Container.Bind<BestMoveFinder>().AsSingle();
             Container.Bind<IGameLogger>().To<GameLogger>().AsSingle();
+
+            Container.Bind<RewardService>().AsSingle().WithArguments(rewardConfig, rewardParent);
+            
             Debug.Log("Game scene data loaded");
         }
     }

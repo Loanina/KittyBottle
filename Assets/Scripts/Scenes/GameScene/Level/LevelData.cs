@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Scenes.GameScene.Reward;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using UnityEngine;
 
 namespace Scenes.GameScene.Level
@@ -10,5 +10,7 @@ namespace Scenes.GameScene.Level
     {
         [ShowInInspector]
         public List<List<int>> level;
+        
+        public RewardData reward;
     }
 }

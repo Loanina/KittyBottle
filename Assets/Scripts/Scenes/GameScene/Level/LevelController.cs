@@ -2,6 +2,7 @@ using System;
 using Core.SavingSystem;
 using Scenes.GameScene.Bottle;
 using Scenes.GameScene.Hints;
+using Scenes.GameScene.Reward;
 using Zenject;
 
 namespace Scenes.GameScene.Level
@@ -16,6 +17,7 @@ namespace Scenes.GameScene.Level
         private readonly PlayerProgressService progressService;
         private readonly HintManager hintManager;
         private readonly MoneyManager moneyManager;
+        private readonly RewardService rewardService;
 
         [Inject]
         public LevelController(
@@ -24,7 +26,8 @@ namespace Scenes.GameScene.Level
             LevelColorMapper colorMapper,
             PlayerProgressService progressService,
             HintManager hintManager,
-            MoneyManager moneyManager)
+            MoneyManager moneyManager,
+            RewardService rewardService)
         {
             this.levelProvider = levelProvider;
             this.bottlesContainer = bottlesContainer;
@@ -32,6 +35,7 @@ namespace Scenes.GameScene.Level
             this.progressService = progressService;
             this.hintManager = hintManager;
             this.moneyManager = moneyManager;
+            this.rewardService = rewardService;
         }
 
         public void Initialize()
@@ -63,11 +67,16 @@ namespace Scenes.GameScene.Level
 
         public void HandleLevelComplete()
         {
-            progressService.SetLastCompletedLevel(currentLevelIndex);
-            moneyManager.AddCoinsForLevel();
             bottlesContainer.DeleteBottles();
-            currentLevelIndex++;
-            LoadLevel(currentLevelIndex);
+            rewardService.ShowRewards(levelProvider.GetLevel(currentLevelIndex).reward, () =>
+            {
+                progressService.SetLastCompletedLevel(currentLevelIndex);
+                moneyManager.AddCoinsForLevel();
+           
+                currentLevelIndex++;
+                LoadLevel(currentLevelIndex);
+            });
+            //если выход из игры или ломание тасков -> добавить обработку
         }
 
         private void OnRestartLevel()
