@@ -1,9 +1,11 @@
 ﻿using Core.InputSystem;
+using UnityEngine;
 using Zenject;
 
 namespace Core.Installers
 {
-    public class InputInstaller : MonoInstaller
+    [CreateAssetMenu(menuName = "Game/Installers/InputInstaller")]
+    public class InputInstaller : ScriptableObjectInstaller<InputInstaller>
     {
         public override void InstallBindings()
         {
