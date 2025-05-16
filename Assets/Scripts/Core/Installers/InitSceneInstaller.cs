@@ -4,7 +4,8 @@ using Zenject;
 
 namespace Core.Installers
 {
-    public class InitSceneInstaller : MonoInstaller
+    [CreateAssetMenu(fileName = "InitSceneInstaller", menuName = "Game/Installers/InitSceneInstaller")]
+    public class InitSceneInstaller : ScriptableObjectInstaller<InitSceneInstaller>
     {
         [SerializeField] private GameObject sceneLoaderPrefab;
 
