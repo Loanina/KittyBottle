@@ -11,6 +11,7 @@ using Scenes.GameScene.Level;
 using Scenes.GameScene.Reward;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Core.Installers
@@ -24,9 +25,8 @@ namespace Core.Installers
         [SerializeField] private LevelCollection levelCollection;
         [SerializeField] private Bottle bottlePrefab;
         [SerializeField] private LayoutSettings layoutSettings;
-        [SerializeField] private Transform bottlesParentTransform;
-        [SerializeField] private RewardConfig rewardConfig;
-        [SerializeField] private Transform rewardParent;
+        [SerializeField] private Transform bottlesRoot;
+        [SerializeField] private RectTransform rewardRoot;
 
         [Button("Clear player data")]
         private void ClearPlayerData()
@@ -51,7 +51,7 @@ namespace Core.Installers
             Container.Bind<BottlesContainer>().AsSingle().WithArguments(layoutSettings);
             Container.BindFactory<Bottle, BottleFactory>()
                 .FromComponentInNewPrefab(bottlePrefab)
-                .UnderTransform(bottlesParentTransform);
+                .UnderTransform(bottlesRoot);
             Container.Bind<PouringService>().AsSingle();
 
             Container.Bind<HintManager>().FromInstance(hintManager).AsSingle();
@@ -59,8 +59,7 @@ namespace Core.Installers
             Container.Bind<BestMoveFinder>().AsSingle();
             Container.Bind<IGameLogger>().To<GameLogger>().AsSingle();
 
-            Container.Bind<RewardService>().AsSingle().WithArguments(rewardConfig, rewardParent);
-            
+            Container.Bind<RewardService>().AsSingle().WithArguments(rewardRoot);
             Debug.Log("Game scene data loaded");
         }
     }

@@ -1,23 +1,26 @@
 ﻿using System;
 using UnityEngine;
+using Zenject;
 
 namespace Scenes.GameScene.Reward
 {
     public class RewardService
     {
-        private readonly RewardConfig config;
-        private readonly Transform uiParent;
+        private readonly RewardFactory factory;
+        private readonly RectTransform rewardRoot;
 
-        public RewardService(RewardConfig config, Transform uiParent)
+        [Inject]
+        public RewardService(RewardFactory factory, RectTransform rewardRoot)
         {
-            this.config = config;
-            this.uiParent = uiParent;
+            this.factory = factory;
+            this.rewardRoot = rewardRoot;
         }
 
         public void ShowRewards(RewardData rewardData, Action OnComplete)
         {
-            var bagView = GameObject.Instantiate(config.bagSource, uiParent);
-            bagView.Setup(rewardData, config);
+            var bagView = factory.Create();
+            bagView.Setup(rewardData);
+            bagView.transform.SetParent(rewardRoot, false);
             bagView.onClaimed += () => OnComplete?.Invoke();
         }
     }

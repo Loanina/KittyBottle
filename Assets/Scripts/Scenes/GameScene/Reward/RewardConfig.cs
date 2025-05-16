@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Scenes.GameScene.Reward.Animation;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
@@ -8,8 +9,7 @@ namespace Scenes.GameScene.Reward
     [CreateAssetMenu (fileName = "RewardConfig", menuName = "Game/Reward Config")]
     public class RewardConfig : SerializedScriptableObject
     {
-        public RewardBagView bagSource;
-        public RewardItemView itemSource;
+        public RewardBagAnimationConfig animationConfig;
         
         [OdinSerialize]
         private Dictionary<RewardType, Texture2D> rewardTextures = new();

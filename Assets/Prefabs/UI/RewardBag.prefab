@@ -89,9 +89,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f08dacd706468ee44805e34f85d77496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
-  clickButton: {fileID: 4618024169708598869}
-  gridRoot: {fileID: 1323148369223113966}
+  backgroundImage: {fileID: 3474847524985533239}
+  bag: {fileID: 669260827624814199}
+  itemsRoot: {fileID: 1323148369223113966}
 --- !u!1 &2648268993824712354
 GameObject:
   m_ObjectHideFlags: 0
