@@ -27,7 +27,7 @@ namespace Scenes.GameScene.Reward.Animation
             bag.DOScale(Vector3.one, config.bagAppearDuration).SetEase(Ease.OutBack);
         }
         
-        public void PlayPickup(RectTransform bag)
+        public void PlayPickup(RectTransform bag, System.Action onComplete = null)
         {
             bag.DOKill();
             var seq = DOTween.Sequence();
