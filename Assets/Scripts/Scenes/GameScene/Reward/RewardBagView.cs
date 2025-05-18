@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.InputSystem;
 using Scenes.GameScene.Reward.Animation;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,14 +9,14 @@ namespace Scenes.GameScene.Reward
 {
     public class RewardBagView : MonoBehaviour
     {
-        
         [SerializeField] private Image backgroundImage;
         [SerializeField] private RectTransform bag;
         [SerializeField] private RectTransform itemsRoot;
         private RewardBagAnimator animator;
         private RewardItemFactory itemFactory;
         private RewardConfig config;
-
+        public event Action OnClaimed;
+        
         [Inject]
         public void Construct(RewardBagAnimator bagAnimator, RewardItemFactory itemFactory, RewardConfig config)
         {
@@ -23,8 +24,14 @@ namespace Scenes.GameScene.Reward
             this.itemFactory = itemFactory;
             this.config = config;
         }
-        
-        public event Action onClaimed;
+
+        public void Show() => animator.PlayAppear(backgroundImage, bag);
+        public void Hide(Action onComplete = null) => animator.PlayDisappear(backgroundImage, bag, onComplete);
+        public void OnClick()
+        {
+            animator.PlayPickup(bag);
+            OnClaimed?.Invoke();
+        }
 
         public void Setup(RewardData data)
         {
@@ -34,9 +41,7 @@ namespace Scenes.GameScene.Reward
                item.transform.SetParent(itemsRoot, false);
                item.Setup(config.GetSprite(entry.type), entry.amount);
             }
-
-            Debug.Log((animator == null) + " animator is null ");
-            if (animator != null) animator.PlayAppear(backgroundImage, bag);
+            Show();
         }
     }
 }

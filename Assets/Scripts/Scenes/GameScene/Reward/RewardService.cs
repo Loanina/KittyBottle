@@ -21,7 +21,15 @@ namespace Scenes.GameScene.Reward
             var bagView = factory.Create();
             bagView.Setup(rewardData);
             bagView.transform.SetParent(rewardRoot, false);
-            bagView.onClaimed += () => OnComplete?.Invoke();
+            bagView.OnClaimed += () => OnComplete?.Invoke();
+        }
+        
+        public void GrantRewards(RewardData data)
+        {
+            foreach (var entry in data.GetAllRewards())
+            {
+                // зачесть монетки, подсказки, билетики
+            }
         }
     }
 }

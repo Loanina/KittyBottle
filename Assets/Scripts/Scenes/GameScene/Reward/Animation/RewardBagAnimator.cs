@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,17 +22,15 @@ namespace Scenes.GameScene.Reward.Animation
 
             backgroundImage.DOFade(config.maxAlpha, config.backgroundAppearDuration)
                 .SetEase(Ease.OutCubic);
-        
-            bag.localScale = Vector3.zero;
-            var seq = DOTween.Sequence();
-            seq.Append(bag.DOScale(config.bagAppearScale * Vector3.one, config.bagAppearDuration / 2).SetEase(Ease.OutBack));
-            seq.Append(bag.DOScale(Vector3.one, config.bagAppearDuration / 2).SetEase(Ease.InOutQuad));
-        }
 
+            bag.localScale = Vector3.zero;
+            bag.DOScale(Vector3.one, config.bagAppearDuration).SetEase(Ease.OutBack);
+        }
+        
         public void PlayPickup(RectTransform bag)
         {
             bag.DOKill();
-            Sequence seq = DOTween.Sequence();
+            var seq = DOTween.Sequence();
             seq.Append(bag.DOScale(config.pickupScale * Vector3.one, config.pickupDuration / 2).SetEase(Ease.OutQuad));
             seq.Append(bag.DOScale(Vector3.one, config.pickupDuration / 2).SetEase(Ease.InQuad));
         }
