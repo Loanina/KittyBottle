@@ -8,12 +8,14 @@ namespace Scenes.GameScene.Reward
     {
         private readonly RewardFactory factory;
         private readonly RectTransform rewardRoot;
+        private readonly RewardInventoryService inventoryService;
 
         [Inject]
-        public RewardService(RewardFactory factory, RectTransform rewardRoot)
+        public RewardService(RewardFactory factory, RectTransform rewardRoot, RewardInventoryService inventoryService)
         {
             this.factory = factory;
             this.rewardRoot = rewardRoot;
+            this.inventoryService = inventoryService;
         }
 
         public void ShowRewards(RewardData rewardData, Action OnComplete)
@@ -21,14 +23,18 @@ namespace Scenes.GameScene.Reward
             var bagView = factory.Create();
             bagView.Setup(rewardData);
             bagView.transform.SetParent(rewardRoot, false);
-            bagView.OnClaimed += () => OnComplete?.Invoke();
+            bagView.OnClaimed += () =>
+            {
+                GrantRewards(rewardData);
+                OnComplete?.Invoke();
+            };
         }
-        
-        public void GrantRewards(RewardData data)
+
+        private void GrantRewards(RewardData data)
         {
             foreach (var entry in data.GetAllRewards())
             {
-                // зачесть монетки, подсказки, билетики
+                inventoryService.Add(entry.type, entry.amount);
             }
         }
     }

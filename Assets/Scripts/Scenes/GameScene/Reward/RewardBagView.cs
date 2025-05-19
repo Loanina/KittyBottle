@@ -36,12 +36,13 @@
                 interactableButton.onClick.RemoveListener(OnClick);
             }
 
-            public void Show() => animator.PlayAppear(backgroundImage, bag);
+            private void Show() => animator.PlayAppear(backgroundImage, bag);
             public void Hide(Action onComplete = null) => animator.PlayDisappear(backgroundImage, bag, onComplete);
             public void OnClick()
             {
                 interactableButton.interactable = false;
-                animator.PlayPickup(bag, () => OnClaimed?.Invoke());
+                animator.PlayPickup(bag);
+                OnClaimed?.Invoke();
             }
 
             public void Setup(RewardData data)

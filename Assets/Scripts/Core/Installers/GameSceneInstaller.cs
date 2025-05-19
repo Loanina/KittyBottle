@@ -21,6 +21,7 @@ namespace Core.Installers
         [SerializeField, Range(0, 1)] private int palletIndex;
         [SerializeField] private int coinsPerLevel = 10;
         [SerializeField] private HintManager hintManager;
+        [SerializeField] private GameUIManager gameUIManager;
         [SerializeField] private ColorPaletteCollection paletteCollection;
         [SerializeField] private LevelCollection levelCollection;
         [SerializeField] private Bottle bottlePrefab;
@@ -41,7 +42,6 @@ namespace Core.Installers
             Container.Bind<LevelColorMapper>().AsSingle();
             Container.Bind<LevelProvider>().AsSingle().WithArguments(levelCollection);
             Container.Bind<PlayerProgressService>().AsSingle();
-            Container.Bind<MoneyManager>().AsSingle().WithArguments(coinsPerLevel);
             Container.Bind<ISaveSystem<PlayerData>>().To<SaveSystemAdapter<PlayerData>>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelController>().AsSingle();
             Container.Bind<LevelCompletionChecker>().AsSingle();
@@ -60,6 +60,9 @@ namespace Core.Installers
             Container.Bind<IGameLogger>().To<GameLogger>().AsSingle();
 
             Container.Bind<RewardService>().AsSingle().WithArguments(rewardRoot);
+            Container.Bind<RewardInventoryService>().AsSingle();
+
+            Container.Bind<GameUIManager>().FromInstance(gameUIManager).AsSingle();
             Debug.Log("Game scene data loaded");
         }
     }

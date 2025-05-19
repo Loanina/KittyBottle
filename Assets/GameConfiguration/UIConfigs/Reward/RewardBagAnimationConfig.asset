@@ -18,5 +18,5 @@ MonoBehaviour:
   minAlpha: 0
   bagAppearDuration: 0.8
   pickupScale: 1.2
-  pickupDuration: 0.5
+  pickupDuration: 0.4
   bagDisappearDuration: 0.8

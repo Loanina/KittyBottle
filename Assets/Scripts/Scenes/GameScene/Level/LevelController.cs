@@ -16,7 +16,6 @@ namespace Scenes.GameScene.Level
         private readonly LevelColorMapper colorMapper;
         private readonly PlayerProgressService progressService;
         private readonly HintManager hintManager;
-        private readonly MoneyManager moneyManager;
         private readonly RewardService rewardService;
 
         [Inject]
@@ -26,7 +25,6 @@ namespace Scenes.GameScene.Level
             LevelColorMapper colorMapper,
             PlayerProgressService progressService,
             HintManager hintManager,
-            MoneyManager moneyManager,
             RewardService rewardService)
         {
             this.levelProvider = levelProvider;
@@ -34,7 +32,6 @@ namespace Scenes.GameScene.Level
             this.colorMapper = colorMapper;
             this.progressService = progressService;
             this.hintManager = hintManager;
-            this.moneyManager = moneyManager;
             this.rewardService = rewardService;
         }
 
@@ -71,7 +68,6 @@ namespace Scenes.GameScene.Level
             rewardService.ShowRewards(levelProvider.GetLevel(currentLevelIndex).reward, () =>
             {
                 progressService.SetLastCompletedLevel(currentLevelIndex);
-                moneyManager.AddCoinsForLevel();
            
                 currentLevelIndex++;
                 LoadLevel(currentLevelIndex);
