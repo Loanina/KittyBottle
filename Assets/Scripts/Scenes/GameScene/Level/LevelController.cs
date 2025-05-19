@@ -68,11 +68,9 @@ namespace Scenes.GameScene.Level
             rewardService.ShowRewards(levelProvider.GetLevel(currentLevelIndex).reward, () =>
             {
                 progressService.SetLastCompletedLevel(currentLevelIndex);
-           
                 currentLevelIndex++;
                 LoadLevel(currentLevelIndex);
             });
-            //если выход из игры или ломание тасков -> добавить обработку
         }
 
         private void OnRestartLevel()

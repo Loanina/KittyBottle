@@ -23,15 +23,13 @@ namespace Scenes.GameScene.Reward
             var bagView = factory.Create();
             bagView.Setup(rewardData);
             bagView.transform.SetParent(rewardRoot, false);
-            bagView.OnClaimed += () =>
-            {
-                GrantRewards(rewardData);
-                OnComplete?.Invoke();
-            };
+            bagView.OnClaimed += () => GrantRewards(rewardData);
+            bagView.OnDestroy += () => OnComplete?.Invoke();
         }
 
         private void GrantRewards(RewardData data)
         {
+            Debug.Log("Grant rewards");
             foreach (var entry in data.GetAllRewards())
             {
                 inventoryService.Add(entry.type, entry.amount);

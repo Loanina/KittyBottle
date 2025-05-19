@@ -1,5 +1,4 @@
 ﻿    using System;
-    using Core.InputSystem;
     using Scenes.GameScene.Reward.Animation;
     using UnityEngine;
     using UnityEngine.UI;
@@ -16,7 +15,10 @@
             private RewardBagAnimator animator;
             private RewardItemFactory itemFactory;
             private RewardConfig config;
+            private bool isClaimed = false;
+
             public event Action OnClaimed;
+            public event Action OnDestroy;
             
             [Inject]
             public void Construct(RewardBagAnimator bagAnimator, RewardItemFactory itemFactory, RewardConfig config)
@@ -40,8 +42,10 @@
             public void Hide(Action onComplete = null) => animator.PlayDisappear(backgroundImage, bag, onComplete);
             public void OnClick()
             {
+                if (isClaimed) return;
+                isClaimed = true;
                 interactableButton.interactable = false;
-                animator.PlayPickup(bag);
+                animator.PlayPickup(bag, () => Hide(() => OnDestroy?.Invoke()));
                 OnClaimed?.Invoke();
             }
 
