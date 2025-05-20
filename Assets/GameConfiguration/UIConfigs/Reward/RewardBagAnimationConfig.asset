@@ -20,3 +20,6 @@ MonoBehaviour:
   pickupScale: 1.2
   pickupDuration: 0.4
   bagDisappearDuration: 0.8
+  maxPulseScale: 1.05
+  minPulseScale: 0.95
+  pulseDuration: 1.5

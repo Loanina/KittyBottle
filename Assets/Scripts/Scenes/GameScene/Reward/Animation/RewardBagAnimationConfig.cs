@@ -20,5 +20,10 @@ namespace Scenes.GameScene.Reward.Animation
 
         [Header("Bag Disappear")]
         [Range(0,10)] public float bagDisappearDuration = 0.25f;
+        
+        [Header("Pulse Animation")]
+        [Range(0.1f,5f)] public float maxPulseScale = 1.1f;
+        [Range(0.1f,5f)] public float minPulseScale = 0.9f;
+        [Range(0,10)] public float pulseDuration = 1.5f;
     }
 } 
