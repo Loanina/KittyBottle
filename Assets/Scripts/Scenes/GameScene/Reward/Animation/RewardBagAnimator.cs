@@ -31,7 +31,8 @@ namespace Scenes.GameScene.Reward.Animation
             bag.DOKill();
             var seq = DOTween.Sequence();
             seq.Append(bag.DOScale(config.pickupScale * Vector3.one, config.pickupDuration / 2).SetEase(Ease.OutQuad));
-            seq.Append(bag.DOScale(Vector3.one, config.pickupDuration / 2).SetEase(Ease.InQuad));
+            seq.Append(bag.DOScale(Vector3.one, config.pickupDuration / 2).SetEase(Ease.InQuad)).
+                OnComplete(() => onComplete?.Invoke());
         }
 
         public void PlayDisappear(Image backgroundImage, RectTransform bag, System.Action onComplete = null)
