@@ -12,7 +12,7 @@ namespace Scenes.GameScene.Reward
         public void Setup(Sprite sprite, int entryAmount)
         {
             icon.sprite = sprite;
-            amountText.text = "* " + entryAmount;
+            amountText.text = entryAmount.ToString();
         }
     }
 }

@@ -19,7 +19,6 @@ namespace Core.Installers
     public class GameSceneInstaller : MonoInstaller
     {
         [SerializeField, Range(0, 1)] private int palletIndex;
-        [SerializeField] private int coinsPerLevel = 10;
         [SerializeField] private HintManager hintManager;
         [SerializeField] private GameUIManager gameUIManager;
         [SerializeField] private ColorPaletteCollection paletteCollection;
