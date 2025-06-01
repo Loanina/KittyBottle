@@ -45,6 +45,7 @@
                 if (isClaimed) return;
                 isClaimed = true;
                 interactableButton.interactable = false;
+                //еще какую-то свеияшку или искорки добавить
                 animator.PlayPickup(bag, () => Hide(() => OnDestroy?.Invoke()));
                 OnClaimed?.Invoke();
             }

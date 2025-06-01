@@ -1808,7 +1808,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   palletIndex: 0
-  coinsPerLevel: 10
   hintManager: {fileID: 1151690156}
   gameUIManager: {fileID: 1116893806}
   paletteCollection: {fileID: 11400000, guid: 6d5e1919c12b539438b9744499b9aa4d, type: 2}
